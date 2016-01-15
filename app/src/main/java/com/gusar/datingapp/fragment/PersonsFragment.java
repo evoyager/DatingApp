@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 
 import com.gusar.datingapp.R;
 import com.gusar.datingapp.adapter.PersonsAdapter;
-import com.gusar.datingapp.model.ModelDating;
+import com.gusar.datingapp.model.ModelPerson;
 
 /**
  * Created by evgeniy on 14.01.16.
@@ -20,7 +20,7 @@ public class PersonsFragment extends DatingFragment {
     OnMapListener onMapListener;
 
     public interface OnMapListener {
-        void onMap(ModelDating modelDating);
+        void onMap(ModelPerson modelPerson);
     }
 
     public void onAttach(Activity activity) {

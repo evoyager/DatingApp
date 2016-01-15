@@ -1,21 +1,22 @@
 package com.gusar.datingapp;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 
 import com.gusar.datingapp.adapter.TabAdapter;
 import com.gusar.datingapp.fragment.DatingFragment;
 import com.gusar.datingapp.fragment.MapFragment;
 import com.gusar.datingapp.fragment.PersonsFragment;
-import com.gusar.datingapp.model.ModelDating;
+import com.gusar.datingapp.model.ModelPerson;
+
+import org.testpackage.test_sdk.android.testlib.API;
+import org.testpackage.test_sdk.android.testlib.db.PersonsHolder;
+import org.testpackage.test_sdk.android.testlib.interfaces.PersonsExtendedCallback;
+import org.testpackage.test_sdk.android.testlib.interfaces.SuccessCallback;
 
 public class HomeActivity extends ActionBarActivity implements PersonsFragment.OnMapListener, MapFragment.OnPersonsListener {
 
@@ -24,6 +25,7 @@ public class HomeActivity extends ActionBarActivity implements PersonsFragment.O
     FragmentManager fragmentManager;
     DatingFragment personsFragment;
     DatingFragment mapFragment;
+    PersonsHolder personsHolder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +35,25 @@ public class HomeActivity extends ActionBarActivity implements PersonsFragment.O
         this.fragmentManager = getSupportFragmentManager();
 
         setUI();
+
+        API.INSTANCE.init(getApplicationContext());
+        API.INSTANCE.refreshPersons(new SuccessCallback() {
+            @Override
+            public void onSuccess(){}
+        });
+
+        API.INSTANCE.getPersons(0, new PersonsExtendedCallback() {
+
+            @Override
+            public void onResult(String json) {
+
+            }
+
+            @Override
+            public void onFail(String reason) {
+
+            }
+        });
 
     }
 
@@ -68,12 +89,12 @@ public class HomeActivity extends ActionBarActivity implements PersonsFragment.O
     }
 
     @Override
-    public void onMap(ModelDating modelDating) {
+    public void onMap(ModelPerson modelPerson) {
 
     }
 
     @Override
-    public void onPersons(ModelDating modelDating) {
+    public void onPersons(ModelPerson modelPerson) {
 
     }
 }
