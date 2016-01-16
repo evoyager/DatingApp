@@ -38,7 +38,7 @@ public class PersonsFragment extends DatingFragment {
         this.layoutManager = new LinearLayoutManager(getActivity());
         this.recyclerView.setLayoutManager(this.layoutManager);
         this.adapter = new PersonsAdapter(this);
-        this.recyclerView.setAdapter(this.adapter);
+//        this.recyclerView.setAdapter(this.adapter);
         return rootView;
     }
 }
