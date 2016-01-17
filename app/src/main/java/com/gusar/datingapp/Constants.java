@@ -1,5 +1,9 @@
 package com.gusar.datingapp;
 
+import com.gusar.datingapp.model.ModelPerson;
+
+import java.util.List;
+
 /**
  * Created by evgeniy on 17.01.16.
  */
@@ -27,6 +31,16 @@ public final class Constants {
             "http://cs307107.vk.me/v307107012/b36c/W9YH6T33M90.jpg",
             "http://cs305600.vk.me/v305600012/19acb/Tj6KB-ZcbiE.jpg"
     };
+
+    private static List<ModelPerson> PERSONS;
+
+    public static void setPersons(List<ModelPerson> persons) {
+        PERSONS = persons;
+    }
+
+    public static List<ModelPerson> getPersons() {
+        return PERSONS;
+    }
 
     private Constants() {}
 

@@ -50,7 +50,7 @@ public class ImageListFragment extends Fragment {
     }
 
     private void applyScrollListener() {
-        listView.setOnScrollListener(new PauseOnScrollListener(ImageLoader.getInstance(), true, true));
+        listView.setOnScrollListener(new PauseOnScrollListener(ImageLoader.getInstance(), false, false));
     }
 
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -58,7 +58,13 @@ public class ImageListFragment extends Fragment {
         inflater.inflate(R.menu.main_menu, menu);
     }
 
-    private  static class ImageAdapter extends BaseAdapter {
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        AnimateFirstDisplayListener.displayedImages.clear();
+    }
+
+    private static class ImageAdapter extends BaseAdapter {
 
         private static final String[] IMAGE_URLS = Constants.IMAGES;
 
@@ -83,7 +89,7 @@ public class ImageListFragment extends Fragment {
 
         @Override
         public int getCount() {
-            return IMAGE_URLS.length;
+            return Constants.getPersons().size();
         }
 
         @Override
@@ -109,7 +115,7 @@ public class ImageListFragment extends Fragment {
                 holder = (ViewHolder) view.getTag();
             }
 
-            ImageLoader.getInstance().displayImage(IMAGE_URLS[position], holder.image, options, animateFirstListener);
+            ImageLoader.getInstance().displayImage(Constants.getPersons().get(position).getPhoto(), holder.image, options, animateFirstListener);
 
             return view;
         }
@@ -117,19 +123,19 @@ public class ImageListFragment extends Fragment {
         static class ViewHolder {
             ImageView image;
         }
+    }
 
-        private static class AnimateFirstDisplayListener extends SimpleImageLoadingListener {
-            static final List<String> displayedImages = Collections.synchronizedList(new LinkedList<String>());
+    private static class AnimateFirstDisplayListener extends SimpleImageLoadingListener {
+        static final List<String> displayedImages = Collections.synchronizedList(new LinkedList<String>());
 
-            @Override
-            public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-                if (loadedImage != null) {
-                    ImageView imageView = (ImageView) view;
-                    boolean firstDisplay = !displayedImages.contains(imageUri);
-                    if (firstDisplay) {
-                        FadeInBitmapDisplayer.animate(imageView, 500);
-                        displayedImages.add(imageUri);
-                    }
+        @Override
+        public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+            if (loadedImage != null) {
+                ImageView imageView = (ImageView) view;
+                boolean firstDisplay = !displayedImages.contains(imageUri);
+                if (firstDisplay) {
+                    FadeInBitmapDisplayer.animate(imageView, 500);
+                    displayedImages.add(imageUri);
                 }
             }
         }
