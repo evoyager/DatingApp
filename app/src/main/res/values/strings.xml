@@ -3,4 +3,7 @@
     <string name="title_activity_home">HomeActivity</string>
     <string name="persons">Persons</string>
     <string name="map">Map</string>
+
+    <!-- Content descriptions -->
+    <string name="descr_image">Image</string>
 </resources>

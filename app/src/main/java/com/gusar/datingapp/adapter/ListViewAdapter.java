@@ -8,7 +8,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
 import com.gusar.datingapp.R;
-import com.gusar.datingapp.loader.ImageLoader;
 
 import java.util.ArrayList;
 import java.util.HashMap;
