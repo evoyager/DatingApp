@@ -10,13 +10,19 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.Transformation;
 import android.widget.AbsListView;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.gusar.datingapp.Constants;
 import com.gusar.datingapp.R;
+import com.gusar.datingapp.model.ModelPerson;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.CircleBitmapDisplayer;
@@ -24,6 +30,8 @@ import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.nostra13.universalimageloader.core.listener.PauseOnScrollListener;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,14 +43,78 @@ import static com.gusar.datingapp.DatingApplication.initImageLoader;
  */
 public class ImageListFragment extends Fragment {
 
+    static final int ANIMATION_DURATION = 200;
     protected AbsListView listView;
+    private static List<MyCell> mAnimList = new ArrayList<MyCell>();
+    private List<ModelPerson> persons;
+    private ImageAdapter mMyAnimListAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fr_image_list, container, false);
+        persons = Constants.getPersons();
+
+        for (int i = 0; i < persons.size(); i++) {
+            MyCell cell = new MyCell();
+            mAnimList.add(cell);
+        }
+
+        mMyAnimListAdapter = new ImageAdapter(getActivity(), R.layout.item_list_image, mAnimList);
         listView = (ListView) rootView.findViewById(android.R.id.list);
-        ((ListView) listView).setAdapter(new ImageAdapter(getActivity()));
+        (listView).setAdapter(mMyAnimListAdapter);
+
         return rootView;
+    }
+
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        setHasOptionsMenu(true);
+        inflater.inflate(R.menu.main_menu, menu);
+    }
+
+    private void deleteCell(final View v, final int index) {
+        AnimationListener al = new AnimationListener() {
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                mAnimList.remove(index);
+
+                ViewHolder vh = (ViewHolder)v.getTag();
+                vh.needInflate = true;
+
+                mMyAnimListAdapter.notifyDataSetChanged();
+            }
+
+            @Override public void onAnimationRepeat(Animation animation) {}
+            @Override public void onAnimationStart(Animation animation) {}
+        };
+        collapse(v, al);
+    }
+
+    private void collapse(final View v, AnimationListener al) {
+        final int initialHeight = v.getMeasuredHeight();
+
+        Animation anim = new Animation() {
+            @Override
+            protected void applyTransformation(float interpolatedTime, Transformation t) {
+                if (interpolatedTime == 1) {
+                    v.setVisibility(View.GONE);
+                }
+                else {
+                    v.getLayoutParams().height = initialHeight - (int)(initialHeight * interpolatedTime);
+                    v.requestLayout();
+                }
+            }
+
+            @Override
+            public boolean willChangeBounds() {
+                return true;
+            }
+        };
+
+        if (al!=null) {
+            anim.setAnimationListener(al);
+        }
+        anim.setDuration(ANIMATION_DURATION);
+        v.startAnimation(anim);
     }
 
     @Override
@@ -55,29 +127,20 @@ public class ImageListFragment extends Fragment {
         listView.setOnScrollListener(new PauseOnScrollListener(ImageLoader.getInstance(), false, false));
     }
 
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        setHasOptionsMenu(true);
-        inflater.inflate(R.menu.main_menu, menu);
-    }
-
     @Override
     public void onDestroy() {
         super.onDestroy();
         AnimateFirstDisplayListener.displayedImages.clear();
     }
 
-    private static class ImageAdapter extends BaseAdapter {
-
-
-
-        private static final String[] IMAGE_URLS = Constants.IMAGES;
+    public class ImageAdapter extends ArrayAdapter<MyCell> {
 
         private LayoutInflater inflater;
         private ImageLoadingListener animateFirstListener = new AnimateFirstDisplayListener();
-
         private DisplayImageOptions options;
 
-        ImageAdapter(Context context) {
+        public ImageAdapter(Context context, int textViewResourceId, List<MyCell> objects) {
+            super(context, textViewResourceId, objects);
             initImageLoader(context);
 
             inflater = LayoutInflater.from(context);
@@ -99,36 +162,48 @@ public class ImageListFragment extends Fragment {
         }
 
         @Override
-        public Object getItem(int position) {
-            return position;
-        }
-
-        @Override
         public long getItemId(int position) {
             return position;
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view = convertView;
-            final ViewHolder holder;
+        public View getView(final int position, View convertView, ViewGroup parent) {
+            final View view;
+
+            ViewHolder holder;
             if (convertView == null) {
                 view = inflater.inflate(R.layout.item_list_image, parent, false);
                 holder = new ViewHolder();
                 holder.image = (ImageView) view.findViewById(R.id.image);
+                holder.btnDislike = (Button) view.findViewById(R.id.btnDislike);
+                holder.btnLike = (Button) view.findViewById(R.id.btnLike);
+                holder.needInflate = false;
                 view.setTag(holder);
             } else {
-                holder = (ViewHolder) view.getTag();
+                view = convertView;
             }
 
-            ImageLoader.getInstance().displayImage(Constants.getPersons().get(position).getPhoto(), holder.image, options, animateFirstListener);
+            holder = (ViewHolder) view.getTag();
+            ImageLoader.getInstance().displayImage(persons.get(position).getPhoto(), holder.image, options, animateFirstListener);
+            holder.btnDislike.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    deleteCell(view, position);
+                }
+            });
 
             return view;
         }
+    }
 
-        static class ViewHolder {
-            ImageView image;
-        }
+    private class ViewHolder {
+        public boolean needInflate;
+        ImageView image;
+        Button btnDislike;
+        Button btnLike;
+    }
+
+    private static class MyCell {
     }
 
     private static class AnimateFirstDisplayListener extends SimpleImageLoadingListener {
@@ -146,4 +221,5 @@ public class ImageListFragment extends Fragment {
             }
         }
     }
+
 }
