@@ -44,7 +44,7 @@ import static com.gusar.datingapp.DatingApplication.initImageLoader;
 public class ImageListFragment extends Fragment {
 
     static final int ANIMATION_DURATION = 200;
-    protected AbsListView listView;
+    protected ListView listView;
     private static List<MyCell> mAnimList = new ArrayList<MyCell>();
     private List<ModelPerson> persons;
     private ImageAdapter mMyAnimListAdapter;
@@ -76,6 +76,7 @@ public class ImageListFragment extends Fragment {
             @Override
             public void onAnimationEnd(Animation animation) {
                 mAnimList.remove(index);
+                persons.remove(index);
 
                 ViewHolder vh = (ViewHolder)v.getTag();
                 vh.needInflate = true;
@@ -136,6 +137,7 @@ public class ImageListFragment extends Fragment {
     public class ImageAdapter extends ArrayAdapter<MyCell> {
 
         private LayoutInflater inflater;
+        private int resId;
         private ImageLoadingListener animateFirstListener = new AnimateFirstDisplayListener();
         private DisplayImageOptions options;
 
@@ -143,7 +145,9 @@ public class ImageListFragment extends Fragment {
             super(context, textViewResourceId, objects);
             initImageLoader(context);
 
-            inflater = LayoutInflater.from(context);
+//            inflater = LayoutInflater.from(context);
+            this.resId = textViewResourceId;
+            this.inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
             options = new DisplayImageOptions.Builder()
                     .showImageOnLoading(R.drawable.ic_stub)
@@ -156,30 +160,30 @@ public class ImageListFragment extends Fragment {
                     .build();
         }
 
-        @Override
-        public int getCount() {
-            return Constants.getPersons().size();
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
+//        @Override
+//        public int getCount() {
+//            return persons.size();
+//        }
+//
+//        @Override
+//        public long getItemId(int position) {
+//            return position;
+//        }
 
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
             final View view;
-
             ViewHolder holder;
+
             if (convertView == null) {
                 view = inflater.inflate(R.layout.item_list_image, parent, false);
-                holder = new ViewHolder();
-                holder.image = (ImageView) view.findViewById(R.id.image);
-                holder.btnDislike = (Button) view.findViewById(R.id.btnDislike);
-                holder.btnLike = (Button) view.findViewById(R.id.btnLike);
-                holder.needInflate = false;
-                view.setTag(holder);
-            } else {
+                setViewHolder(view);
+            }
+            else if (((ViewHolder)convertView.getTag()).needInflate) {
+                view = inflater.inflate(R.layout.item_list_image, parent, false);
+                setViewHolder(view);
+            }
+            else {
                 view = convertView;
             }
 
@@ -193,6 +197,15 @@ public class ImageListFragment extends Fragment {
             });
 
             return view;
+        }
+
+        private void setViewHolder(View view) {
+            ViewHolder vh = new ViewHolder();
+            vh.image = (ImageView) view.findViewById(R.id.image);
+            vh.btnLike = (Button) view.findViewById(R.id.btnLike);
+            vh.btnDislike = (Button) view.findViewById(R.id.btnDislike);
+            vh.needInflate = false;
+            view.setTag(vh);
         }
     }
 
