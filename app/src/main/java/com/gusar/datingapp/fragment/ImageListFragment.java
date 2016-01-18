@@ -28,6 +28,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.gusar.datingapp.DatingApplication.initImageLoader;
+
 /**
  * @author evoyager
  */
@@ -66,6 +68,8 @@ public class ImageListFragment extends Fragment {
 
     private static class ImageAdapter extends BaseAdapter {
 
+
+
         private static final String[] IMAGE_URLS = Constants.IMAGES;
 
         private LayoutInflater inflater;
@@ -74,6 +78,8 @@ public class ImageListFragment extends Fragment {
         private DisplayImageOptions options;
 
         ImageAdapter(Context context) {
+            initImageLoader(context);
+
             inflater = LayoutInflater.from(context);
 
             options = new DisplayImageOptions.Builder()

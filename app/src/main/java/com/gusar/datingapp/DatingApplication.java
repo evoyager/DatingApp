@@ -25,7 +25,7 @@ public class DatingApplication extends Application {
 
 		super.onCreate();
 
-		initImageLoader(getApplicationContext());
+//		initImageLoader(getApplicationContext());
 	}
 
 	public static void initImageLoader(Context context) {

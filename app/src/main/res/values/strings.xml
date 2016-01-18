@@ -6,4 +6,6 @@
 
     <!-- Content descriptions -->
     <string name="descr_image">Image</string>
+    <string name="btnDislike">dislike</string>
+    <string name="btnLike">like</string>
 </resources>
