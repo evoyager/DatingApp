@@ -84,8 +84,7 @@ public class ImageListFragment extends Fragment {
                 mMyAnimListAdapter.notifyDataSetChanged();
 
                 if(mAnimList.size() == 0) {
-                    Intent i = new Intent(getActivity().getApplicationContext(), MainActivity.class);
-                    startActivity(i);
+                    getFragmentManager().popBackStack();
                 }
             }
 

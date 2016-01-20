@@ -96,7 +96,6 @@ public class MainActivity extends FragmentActivity {
                      } else {
                          Type listType = new TypeToken<ArrayList<ModelPerson>>() {
                          }.getType();
-//                    persons = new Gson().fromJson(json, listType);
                          Constants.setPersons((List<ModelPerson>) new Gson().fromJson(json, listType));
                      }
                  }
@@ -112,7 +111,10 @@ public class MainActivity extends FragmentActivity {
             setTitle(R.string.app_name);
             fr = new ImageListFragment();
             tag = ImageListFragment.class.getSimpleName();
-            getSupportFragmentManager().beginTransaction().replace(android.R.id.content, fr, tag).commit();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(android.R.id.content, fr, tag)
+                    .addToBackStack("fr_image_list")
+                    .commit();
         }
 
     }
