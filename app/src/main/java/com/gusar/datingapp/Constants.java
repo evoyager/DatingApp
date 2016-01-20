@@ -5,6 +5,7 @@ import com.gusar.datingapp.model.ModelPerson;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by evgeniy on 17.01.16.
@@ -26,14 +27,18 @@ public final class Constants {
     }
 
     private static List<ModelPerson> PERSONS = new ArrayList<ModelPerson>();
-    private static List<Integer> liked = new ArrayList<Integer>();
+    private static Map<Integer, Boolean> liked = new HashMap<Integer, Boolean>();
 
-    public static void addLiked(Integer id) {
-        liked.add(id);
+    public static void changeLikeStatus(Integer id, boolean like) {
+        if (like)
+            liked.put(id, true);
+        else {
+            liked.remove(id);
+        }
     }
 
     public static boolean isLiked(Integer id) {
-        return liked.contains(id);
+        return liked.containsKey(id);
     }
 
     public static void setPersons(List<ModelPerson> persons) {

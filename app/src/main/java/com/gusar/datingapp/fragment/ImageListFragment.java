@@ -178,7 +178,7 @@ public class ImageListFragment extends Fragment {
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
             final View view;
-            ViewHolder holder;
+            final ViewHolder holder;
 
             if (convertView == null) {
                 view = inflater.inflate(R.layout.item_list_image, parent, false);
@@ -202,13 +202,16 @@ public class ImageListFragment extends Fragment {
             holder.btnDislike.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    Constants.changeLikeStatus(persons.get(position).getId(), false);
+                    holder.heart.setVisibility(View.INVISIBLE);
                     deleteCell(view, position);
                 }
             });
             holder.btnLike.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Constants.addLiked(persons.get(position).getId());
+                    Constants.changeLikeStatus(persons.get(position).getId(), true);
+                    holder.heart.setVisibility(View.VISIBLE);
                     deleteCell(view, position);
                 }
             });
