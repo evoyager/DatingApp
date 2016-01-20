@@ -48,6 +48,7 @@ public class ImageListFragment extends Fragment {
     private static List<MyCell> mAnimList = new ArrayList<MyCell>();
     private List<ModelPerson> persons;
     private ImageAdapter mMyAnimListAdapter;
+    private ModelPerson currentPerson;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -192,7 +193,11 @@ public class ImageListFragment extends Fragment {
             }
 
             holder = (ViewHolder) view.getTag();
-            ImageLoader.getInstance().displayImage(persons.get(position).getPhoto(), holder.image, options, animateFirstListener);
+            currentPerson = persons.get(position);
+            ImageLoader.getInstance().displayImage(currentPerson.getPhoto(), holder.image, options, animateFirstListener);
+            if (Constants.isLiked(currentPerson.getId())) {
+                holder.heart.setVisibility(View.VISIBLE);
+            }
 
             holder.btnDislike.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -214,6 +219,7 @@ public class ImageListFragment extends Fragment {
         private void setViewHolder(View view) {
             ViewHolder vh = new ViewHolder();
             vh.image = (ImageView) view.findViewById(R.id.image);
+            vh.heart = (ImageView) view.findViewById(R.id.heart);
             vh.btnLike = (Button) view.findViewById(R.id.btnLike);
             vh.btnDislike = (Button) view.findViewById(R.id.btnDislike);
             vh.needInflate = false;
@@ -224,6 +230,7 @@ public class ImageListFragment extends Fragment {
     private class ViewHolder {
         public boolean needInflate;
         ImageView image;
+        ImageView heart;
         Button btnDislike;
         Button btnLike;
     }
