@@ -1,6 +1,7 @@
 package com.gusar.datingapp.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -13,14 +14,13 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.Transformation;
-import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.gusar.datingapp.Constants;
+import com.gusar.datingapp.MainActivity;
 import com.gusar.datingapp.R;
 import com.gusar.datingapp.model.ModelPerson;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -82,6 +82,11 @@ public class ImageListFragment extends Fragment {
                 vh.needInflate = true;
 
                 mMyAnimListAdapter.notifyDataSetChanged();
+
+                if(mAnimList.size() == 0) {
+                    Intent i = new Intent(getActivity().getApplicationContext(), MainActivity.class);
+                    startActivity(i);
+                }
             }
 
             @Override public void onAnimationRepeat(Animation animation) {}
@@ -190,6 +195,12 @@ public class ImageListFragment extends Fragment {
             holder = (ViewHolder) view.getTag();
             ImageLoader.getInstance().displayImage(persons.get(position).getPhoto(), holder.image, options, animateFirstListener);
             holder.btnDislike.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    deleteCell(view, position);
+                }
+            });
+            holder.btnLike.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     deleteCell(view, position);

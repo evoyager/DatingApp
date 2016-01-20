@@ -9,6 +9,16 @@ import java.util.List;
  */
 public final class Constants {
 
+    private static int page_num = 0;
+
+    public static void setPageNum(int page_number) {
+        page_num = page_number;
+    }
+
+    public static int getPageNum() {
+        return page_num++;
+    }
+
     public static final String[] IMAGES = new String[] {
             "https://lh6.googleusercontent.com/-55osAWw3x0Q/URquUtcFr5I/AAAAAAAAAbs/rWlj1RUKrYI/s1024/A%252520Photographer.jpg",
             "https://lh4.googleusercontent.com/--dq8niRp7W4/URquVgmXvgI/AAAAAAAAAbs/-gnuLQfNnBA/s1024/A%252520Song%252520of%252520Ice%252520and%252520Fire.jpg",

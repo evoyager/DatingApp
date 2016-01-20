@@ -6,6 +6,8 @@ import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -34,18 +36,24 @@ public class MainActivity extends FragmentActivity {
     String tag;
     ProgressDialog mProgressDialog;
     List<ModelPerson> persons;
+    Button btnGenerate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        File testImageOnSdCard = new File("/mnt/sdcard", TEST_FILE_NAME);
-        if (!testImageOnSdCard.exists()) {
-            copyTestImageToSdCard(testImageOnSdCard);
-        }
-
-        new DownloadJSON().execute();
+        btnGenerate = (Button) findViewById(R.id.btnGenerate);
+        btnGenerate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                File testImageOnSdCard = new File("/mnt/sdcard", TEST_FILE_NAME);
+                if (!testImageOnSdCard.exists()) {
+                    copyTestImageToSdCard(testImageOnSdCard);
+                }
+                new DownloadJSON().execute();
+            }
+        });
     }
 
      // DownloadJSON AsyncTask
@@ -73,20 +81,29 @@ public class MainActivity extends FragmentActivity {
                 public void onSuccess() {}
             });
 
-            API.INSTANCE.getPersons(0, new PersonsExtendedCallback() {
-                @Override
-                public void onResult(String json) {
-                    Type listType = new TypeToken<ArrayList<ModelPerson>>() {
-                    }.getType();
-//                    persons = new Gson().fromJson(json, listType);
-                    Constants.setPersons((List<ModelPerson>)new Gson().fromJson(json, listType));
-                }
-                @Override
-                public void onFail(String reason) {}
-            });
+            getPersons();
 
             return null;
         }
+
+         private void getPersons() {
+             API.INSTANCE.getPersons(Constants.getPageNum(), new PersonsExtendedCallback() {
+                 @Override
+                 public void onResult(String json) {
+                     if (json.equals("[]")) {
+                         Constants.setPageNum(0);
+                         getPersons();
+                     } else {
+                         Type listType = new TypeToken<ArrayList<ModelPerson>>() {
+                         }.getType();
+//                    persons = new Gson().fromJson(json, listType);
+                         Constants.setPersons((List<ModelPerson>) new Gson().fromJson(json, listType));
+                     }
+                 }
+                 @Override
+                 public void onFail(String reason) {}
+             });
+         }
 
         @Override
         protected void onPostExecute(Void args) {
