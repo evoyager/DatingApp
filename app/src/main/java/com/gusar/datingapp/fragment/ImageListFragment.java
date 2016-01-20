@@ -193,6 +193,7 @@ public class ImageListFragment extends Fragment {
 
             holder = (ViewHolder) view.getTag();
             ImageLoader.getInstance().displayImage(persons.get(position).getPhoto(), holder.image, options, animateFirstListener);
+
             holder.btnDislike.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -202,6 +203,7 @@ public class ImageListFragment extends Fragment {
             holder.btnLike.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    Constants.addLiked(persons.get(position).getId());
                     deleteCell(view, position);
                 }
             });
