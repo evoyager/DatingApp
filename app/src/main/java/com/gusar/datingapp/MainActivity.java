@@ -1,7 +1,10 @@
 package com.gusar.datingapp;
 
 
+import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -11,14 +14,13 @@ import android.widget.Button;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.gusar.datingapp.fragment.ImageListFragment;
+import com.gusar.datingapp.fragment.PersonsFragment;
 import com.gusar.datingapp.model.ModelPerson;
 import com.nostra13.universalimageloader.utils.L;
 
 import org.testpackage.test_sdk.android.testlib.API;
 import org.testpackage.test_sdk.android.testlib.interfaces.PersonsExtendedCallback;
 import org.testpackage.test_sdk.android.testlib.interfaces.SuccessCallback;
-import org.testpackage.test_sdk.android.testlib.model.Person;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -29,12 +31,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends Activity {
 
     private static final String TEST_FILE_NAME = "Universal Image Loader @#&=+-_.,!()~'%20.png";
     Fragment fr;
     String tag;
-    ProgressDialog mProgressDialog;
+    static ProgressDialog mProgressDialog;
     List<ModelPerson> persons;
     Button btnGenerate;
 
@@ -51,25 +53,24 @@ public class MainActivity extends FragmentActivity {
                 if (!testImageOnSdCard.exists()) {
                     copyTestImageToSdCard(testImageOnSdCard);
                 }
-                new DownloadJSON().execute();
+                new DownloadJSON(getApplicationContext()).execute();
             }
         });
     }
 
-     // DownloadJSON AsyncTask
     private class DownloadJSON extends AsyncTask<Void, Void, Void> {
+        Context context;
+        private DownloadJSON(Context context) {
+            this.context = context.getApplicationContext();
+        }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            // Create a progressdialog
             mProgressDialog = new ProgressDialog(MainActivity.this);
-            // Set progressdialog title
             mProgressDialog.setTitle("Parsing data from JSON through testlib API");
-            // Set progressdialog message
             mProgressDialog.setMessage("Loading...");
             mProgressDialog.setIndeterminate(false);
-            // Show progressdialog
             mProgressDialog.show();
         }
 
@@ -108,13 +109,19 @@ public class MainActivity extends FragmentActivity {
         protected void onPostExecute(Void args) {
             mProgressDialog.dismiss();
 
-            setTitle(R.string.app_name);
-            fr = new ImageListFragment();
-            tag = ImageListFragment.class.getSimpleName();
-            getSupportFragmentManager().beginTransaction()
-                    .replace(android.R.id.content, fr, tag)
-                    .addToBackStack("fr_image_list")
-                    .commit();
+            super.onPostExecute(args);
+            MainActivity.mProgressDialog.dismiss();
+            Intent intent = new Intent(context, DatingActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+
+//            setTitle(R.string.app_name);
+//            fr = new PersonsFragment();
+//            tag = PersonsFragment.class.getSimpleName();
+//            getSupportFragmentManager().beginTransaction()
+//                    .replace(android.R.id.content, fr, tag)
+//                    .addToBackStack("fr_image_list")
+//                    .commit();
         }
 
     }

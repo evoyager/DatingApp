@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,7 +42,7 @@ import static com.gusar.datingapp.DatingApplication.initImageLoader;
 /**
  * @author evoyager
  */
-public class ImageListFragment extends Fragment {
+public class PersonsFragment extends Fragment {
 
     static final int ANIMATION_DURATION = 200;
     protected ListView listView;
@@ -49,6 +50,7 @@ public class ImageListFragment extends Fragment {
     private List<ModelPerson> persons;
     private ImageAdapter mMyAnimListAdapter;
     private ModelPerson currentPerson;
+    private ViewPager pager;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
