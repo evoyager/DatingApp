@@ -120,7 +120,7 @@ public class MainActivity extends Activity {
 //            tag = PersonsFragment.class.getSimpleName();
 //            getSupportFragmentManager().beginTransaction()
 //                    .replace(android.R.id.content, fr, tag)
-//                    .addToBackStack("fr_image_list")
+//                    .addToBackStack("fr_persons")
 //                    .commit();
         }
 

@@ -1,13 +1,11 @@
 package com.gusar.datingapp.fragment;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,7 +20,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.gusar.datingapp.Constants;
-import com.gusar.datingapp.MainActivity;
 import com.gusar.datingapp.R;
 import com.gusar.datingapp.model.ModelPerson;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -55,7 +52,7 @@ public class PersonsFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fr_image_list, container, false);
+        View rootView = inflater.inflate(R.layout.fr_persons, container, false);
         persons = Constants.getPersons();
 
         for (int i = 0; i < persons.size(); i++) {
