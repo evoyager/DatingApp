@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -87,7 +88,7 @@ public class PersonsFragment extends Fragment {
                 mMyAnimListAdapter.notifyDataSetChanged();
 
                 if(mAnimList.size() == 0) {
-                    getFragmentManager().popBackStack();
+                    getActivity().finish();
                 }
             }
 
@@ -166,16 +167,6 @@ public class PersonsFragment extends Fragment {
                     .displayer(new CircleBitmapDisplayer(Color.WHITE, 5))
                     .build();
         }
-
-//        @Override
-//        public int getCount() {
-//            return persons.size();
-//        }
-//
-//        @Override
-//        public long getItemId(int position) {
-//            return position;
-//        }
 
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
