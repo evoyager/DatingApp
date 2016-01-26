@@ -19,10 +19,14 @@ public class DatingActivity extends FragmentActivity {
     private static final String STATE_POSITION = "STATE_POSITION";
     private ViewPager pager;
 
+    public static FragmentManager fragmentManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ac_dating);
+
+        fragmentManager = getSupportFragmentManager();
 
         int pagerPosition = savedInstanceState == null ? 0 : savedInstanceState.getInt(STATE_POSITION);
 

@@ -1,78 +1,58 @@
 package com.gusar.datingapp.fragment;
 
+
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
-import com.google.android.gms.maps.*;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.gusar.datingapp.R;
 
-/**
- * @author evoyager
- */
+public class MapFragment extends Fragment {
+    private GoogleMap map;
+    private SupportMapFragment fragment;
+//    static final LatLng HAMBURG = new LatLng(53.558, 9.927);
+//    static final LatLng KIEL = new LatLng(53.551, 9.993);
 
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.fr_maps, container, false);
 
-public class MapFragment extends android.support.v4.app.Fragment {
-    GoogleMap m_googleMap;
-    StreetViewPanorama m_StreetView;
+//        map = ((SupportMapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+//        Marker hamburg = map.addMarker(new MarkerOptions().position(HAMBURG)
+//        .title("Hamburg"));
+//
+//        map.moveCamera(CameraUpdateFactory.newLatLngZoom(HAMBURG, 15));
+//        map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
+
+        return v;
+    }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fr_maps, container, false);
-        createMapView();
-        createStreetView();
-
-        m_googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latLng) {
-                if (m_StreetView != null) {
-                    Fragment mapView = getFragmentManager().findFragmentById(R.id.mapView);
-                    getFragmentManager().beginTransaction().hide(mapView).commit();
-
-                    m_StreetView.setPosition(latLng);
-                }
-            }
-        });
-
-        return rootView;
-    }
-
-    private void createStreetView() {
-        m_StreetView = ((SupportStreetViewPanoramaFragment)
-                getFragmentManager().findFragmentById(R.id.streetView))
-                .getStreetViewPanorama();
-    }
-
-    private void createMapView() {
-        try {
-            if(null == m_googleMap) {
-                m_googleMap = ((MapFragment) getFragmentManager().findFragmentById(
-                        R.id.mapView)).getMap();
-
-                if(null == m_googleMap) {
-                    Toast.makeText(getApplicationContext(),
-                            "Error creating map", Toast.LENGTH_SHORT).show();
-                }
-            }
-        } catch (NullPointerException exception) {
-            Log.e("mapApp", exception.toString());
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        FragmentManager fm = getChildFragmentManager();
+        fragment = (SupportMapFragment) fm.findFragmentById(R.id.map);
+        if (fragment == null) {
+            fragment = SupportMapFragment.newInstance();
+            fm.beginTransaction().replace(R.id.map, fragment).commit();
         }
     }
 
-    private void addMaker() {
-        if (null != m_googleMap) {
-            m_googleMap.addMarker(new MarkerOptions()
-                                .position(new LatLng(0, 0))
-                                .title("Marker")
-                                 .draggable(true)
-            );
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (map == null) {
+            map = fragment.getMap();
+            map.addMarker(new MarkerOptions().position(new LatLng(0, 0)));
         }
     }
 }
