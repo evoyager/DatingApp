@@ -6,5 +6,6 @@
     <color name="colorAccent">#FF4081</color>
     <color name="gray_200">#eeeeee</color>
     <color name="gray_50">#fafafa</color>
+    <color name="dark_toolbar">#1f1f1f</color>
     <color name="dark_backgr">#2e2e2e</color>
 </resources>
