@@ -11,10 +11,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -72,18 +74,30 @@ public class MapFragment extends DatingFragment {
         super.onResume();
         if (map == null) {
             map = fragment.getMap();
-             String[] splLoc;
-            Double lat;
-            Double lon;
             List<String> parseMap = new ArrayList<String>();
             for (ModelPerson mp: PERSONS) {
-                splLoc = mp.getLocation().split(",");
-                lat = Double.parseDouble(splLoc[0]);
-                lon = Double.parseDouble(splLoc[1]);
-                map.addMarker(new MarkerOptions().position(new LatLng(lat, lon)));
-                parseMap.add(lat + "," + lon);
+                map.addMarker(new MarkerOptions().position(getLatLng(mp)));
+                parseMap.add(getLatLng(mp).toString());
             }
-
         }
+        zoomCamera();
+    }
+
+    public void zoomCamera() {
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(getLatLng(PERSONS.get(0)))
+                .zoom(12)
+                .bearing(45)
+                .tilt(20)
+                .build();
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
+        map.animateCamera(cameraUpdate);
+    }
+
+    private LatLng getLatLng(ModelPerson person) {
+        String[] splitLocation = person.getLocation().split(",");
+        Double lat = Double.parseDouble(splitLocation[0]);
+        Double lon = Double.parseDouble(splitLocation[1]);
+        return new LatLng(lat, lon);
     }
 }
