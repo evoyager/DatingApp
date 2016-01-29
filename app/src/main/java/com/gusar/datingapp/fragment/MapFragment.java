@@ -18,14 +18,22 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.gusar.datingapp.Constants;
 import com.gusar.datingapp.R;
 import com.gusar.datingapp.adapter.MapAdapter;
 import com.gusar.datingapp.model.ModelPerson;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MapFragment extends DatingFragment {
     private GoogleMap map;
     private SupportMapFragment fragment;
     OnPersonsListener onPersonsListener;
+
+    private static List<ModelPerson> PERSONS;
 
     public interface OnPersonsListener {
         void onPersons(ModelPerson modelPerson);
@@ -40,11 +48,9 @@ public class MapFragment extends DatingFragment {
         }
     }
 
-    static final LatLng HAMBURG = new LatLng(53.558, 9.927);
-    static final LatLng KIEL = new LatLng(53.551, 9.993);
-
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fr_maps, container, false);
+        PERSONS = Constants.getPersons();
 
         return v;
     }
@@ -66,7 +72,18 @@ public class MapFragment extends DatingFragment {
         super.onResume();
         if (map == null) {
             map = fragment.getMap();
-            map.addMarker(new MarkerOptions().position(new LatLng(0, 0)));
+             String[] splLoc;
+            Double lat;
+            Double lon;
+            List<String> parseMap = new ArrayList<String>();
+            for (ModelPerson mp: PERSONS) {
+                splLoc = mp.getLocation().split(",");
+                lat = Double.parseDouble(splLoc[0]);
+                lon = Double.parseDouble(splLoc[1]);
+                map.addMarker(new MarkerOptions().position(new LatLng(lat, lon)));
+                parseMap.add(lat + "," + lon);
+            }
+
         }
     }
 }
