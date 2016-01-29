@@ -2,6 +2,10 @@ package com.gusar.datingapp.fragment;
 
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -16,6 +20,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -75,13 +81,25 @@ public class MapFragment extends DatingFragment {
         if (map == null) {
             map = fragment.getMap();
             List<String> parseMap = new ArrayList<String>();
+            Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.a);
+            icon = icon.createScaledBitmap(icon, 100, 100, true);
+            BitmapDescriptor descriptor = BitmapDescriptorFactory.fromBitmap(icon);
             for (ModelPerson mp: PERSONS) {
-                map.addMarker(new MarkerOptions().position(getLatLng(mp)));
+
+                map.addMarker(new MarkerOptions().position(getLatLng(mp))
+                .icon(descriptor));
                 parseMap.add(getLatLng(mp).toString());
             }
         }
         zoomCamera();
     }
+
+    private Drawable resize(Drawable image) {
+        Bitmap b = ((BitmapDrawable)image).getBitmap();
+        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, 50, 50, false);
+        return new BitmapDrawable(getResources(), bitmapResized);
+    }
+
 
     public void zoomCamera() {
         CameraPosition cameraPosition = new CameraPosition.Builder()
