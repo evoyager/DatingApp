@@ -40,49 +40,33 @@ public class MapFragment extends DatingFragment {
         }
     }
 
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_map, container, false);
-        this.recyclerView = (RecyclerView) rootView.findViewById(R.id.rvMapDating);
-        this.layoutManager = new LinearLayoutManager(getActivity());
-        this.recyclerView.setLayoutManager(this.layoutManager);
-        this.adapter = new MapAdapter(this);
-        this.recyclerView.setAdapter(this.adapter);
-        return rootView;
-    }
-//    static final LatLng HAMBURG = new LatLng(53.558, 9.927);
-//    static final LatLng KIEL = new LatLng(53.551, 9.993);
+    static final LatLng HAMBURG = new LatLng(53.558, 9.927);
+    static final LatLng KIEL = new LatLng(53.551, 9.993);
 
-//    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-//        View v = inflater.inflate(R.layout.fr_maps, container, false);
-//
-////        map = ((SupportMapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
-////        Marker hamburg = map.addMarker(new MarkerOptions().position(HAMBURG)
-////        .title("Hamburg"));
-////
-////        map.moveCamera(CameraUpdateFactory.newLatLngZoom(HAMBURG, 15));
-////        map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
-//
-//        return v;
-//    }
-//
-//    @Override
-//    public void onActivityCreated(Bundle savedInstanceState) {
-//        super.onActivityCreated(savedInstanceState);
-////        FragmentManager fm = getChildFragmentManager();
-//        FragmentManager fm = getActivity().getSupportFragmentManager();
-//        fragment = (SupportMapFragment) fm.findFragmentById(R.id.map);
-//        if (fragment == null) {
-//            fragment = SupportMapFragment.newInstance();
-//            fm.beginTransaction().replace(R.id.map, fragment).commit();
-//        }
-//    }
-//
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        if (map == null) {
-//            map = fragment.getMap();
-//            map.addMarker(new MarkerOptions().position(new LatLng(0, 0)));
-//        }
-//    }
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.fr_maps, container, false);
+
+        return v;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+//        FragmentManager fm = getChildFragmentManager();
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        fragment = (SupportMapFragment) fm.findFragmentById(R.id.map);
+        if (fragment == null) {
+            fragment = SupportMapFragment.newInstance();
+            fm.beginTransaction().replace(R.id.map, fragment).commit();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (map == null) {
+            map = fragment.getMap();
+            map.addMarker(new MarkerOptions().position(new LatLng(0, 0)));
+        }
+    }
 }
