@@ -4,6 +4,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
+import com.gusar.datingapp.fragment.DownloadImagesFragment;
 import com.gusar.datingapp.fragment.MapFragment;
 import com.gusar.datingapp.fragment.PersonsFragment;
 
@@ -13,7 +14,8 @@ import com.gusar.datingapp.fragment.PersonsFragment;
 public class TabAdapter extends FragmentStatePagerAdapter {
     public static final int PERSONS_FRAGMENT_POSITION = 0;
     public static final int MAP_FRAGMENT_POSITION = 1;
-    private PersonsFragment personsFragment = new PersonsFragment();
+//    private PersonsFragment personsFragment = new PersonsFragment();
+    private DownloadImagesFragment personsFragment = new DownloadImagesFragment();
     private MapFragment mapFragment = new MapFragment();
     private int numberOfTabs;
 

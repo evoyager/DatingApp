@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import com.gusar.datingapp.adapter.TabAdapter;
+import com.gusar.datingapp.fragment.DownloadImagesFragment;
 import com.gusar.datingapp.fragment.MapFragment;
 import com.gusar.datingapp.fragment.PersonsFragment;
 import com.gusar.datingapp.model.ModelPerson;
@@ -57,7 +58,8 @@ public class DatingActivity extends ActionBarActivity  implements PersonsFragmen
         this.tabAdapter = new TabAdapter(this.fragmentManager, 2);
         viewPager.setAdapter(this.tabAdapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        this.personsFragment = (PersonsFragment) this.tabAdapter.getItem(0);
+//        this.personsFragment = (PersonsFragment) this.tabAdapter.getItem(0);
+        this.personsFragment = (DownloadImagesFragment) this.tabAdapter.getItem(0);
         this.mapFragment = (MapFragment) this.tabAdapter.getItem(1);
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
