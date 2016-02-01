@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -32,18 +34,10 @@ import java.util.List;
  */
 public class DownloadImagesFragment extends Fragment {
 
-    ProgressBar progress;
-
     final int NUMBER_OF_PERSONS = Constants.getPersons().size();
-    ImageView[] targetImage = new ImageView[NUMBER_OF_PERSONS];
-    int[] images = new int[NUMBER_OF_PERSONS];
-    Bitmap[] aBM = new Bitmap[NUMBER_OF_PERSONS];
 
-    ArrayList<Person> persons = new ArrayList<Person>();
     DownloadImagesAdapter diAdapter;
     private List<ModelPerson> modelpersons;
-    String[] strImages = new String[NUMBER_OF_PERSONS];
-    URL[] urlImages = new URL[NUMBER_OF_PERSONS];
 
     final String LOG_TAG = "myLogs";
 
@@ -63,8 +57,12 @@ public class DownloadImagesFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fr_download_images, null);
         modelpersons = Constants.getPersons();
 
-        fillData();
-        diAdapter = new DownloadImagesAdapter(getActivity(), persons);
+        List<String> list = new ArrayList<>();
+        for (ModelPerson person: modelpersons) {
+            list.add(person.getPhoto());
+        }
+
+        diAdapter = new DownloadImagesAdapter(getActivity(), R.layout.item_list_image, list);
 
         ListView lvMain = (ListView) rootView.findViewById(R.id.persons_list);
         lvMain.setAdapter(diAdapter);
@@ -72,110 +70,78 @@ public class DownloadImagesFragment extends Fragment {
         return rootView;
     }
 
-    private void fillData() {
+    private class DownloadImagesAdapter extends ArrayAdapter<String> {
 
-        for (int i = 0; i < NUMBER_OF_PERSONS; i++) {
-            strImages[i] = modelpersons.get(i).getPhoto();
-            try {
-                urlImages[i] = new URL(strImages[i]);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
-        }
-        new MyAsyncTask().execute(urlImages);
-    }
-
-    private class MyAsyncTask extends AsyncTask<URL, Integer, Void> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Void doInBackground(URL... urls) {
-            if(urls.length > 0) {
-                for (int i = 0; i < urls.length; i++) {
-                    URL networkUrl = urls[i];
-
-                    try {
-                        aBM[i] = BitmapFactory.decodeStream(networkUrl.openConnection().getInputStream());
-                        persons.add(new Person(aBM[i]));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-//                    publishProgress(i);
-
-//                    try {
-//                        Thread.sleep(1500);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-                }
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            Toast.makeText(getActivity(), "Загрузка завершена", Toast.LENGTH_LONG).show();
-        }
-
-//        @Override
-//        protected void onProgressUpdate(Integer... values) {
-//            if (values.length > 0) {
-//                for (int i = 0; i < values.length; i++) {
-//                    aIV[values[i]].setImageBitmap(aBM[values[i]]);
-//                    progressBar.setProgress((values[i]+1) * 33 + 1);
-//                }
-//            }
-//        }
-    }
-
-    private class DownloadImagesAdapter extends BaseAdapter {
         Context ctx;
-        LayoutInflater lInflater;
-        ArrayList<Person> persons;
+        List<String> mList;
+        LayoutInflater mInflater;
+        int mResource;
 
-        public DownloadImagesAdapter(Context context, ArrayList<Person> persons) {
+
+        public DownloadImagesAdapter(Context context, int resource, List<String> objects) {
+            super(context, resource, objects);
+
             ctx = context;
-            this.persons = persons;
-            lInflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        }
+            mList = objects;
+            mResource = resource;
+            mInflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        @Override
-        public int getCount() {
-            return persons.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return persons.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            View view = convertView;
-            if (view == null) {
-                view = lInflater.inflate(R.layout.item_list_image, parent, false);
+            View view;
+            if(convertView == null) {
+                view = mInflater.inflate(mResource, parent, false);
+            } else {
+                view = convertView;
             }
 
-            Person p = getPerson(position);
-//            ((ImageView) view.findViewById(R.id.image)).setImageResource(p.image);
+            ImageView imageView = (ImageView) view.findViewById(R.id.image);
+            imageView.setTag(mList.get(position));
+            new LoadImage(imageView).execute();
 
-            ((ImageView) view.findViewById(R.id.image)).setImageBitmap(aBM[position]);
             return view;
         }
+    }
 
-        Person getPerson(int position) {
-            return ((Person) getItem(position));
+    private class LoadImage extends AsyncTask<Object, Void, Bitmap> {
+
+        private ImageView imv;
+        private URL path;
+
+        public LoadImage(ImageView imv) {
+            this.imv = imv;
+            try {
+                this.path = new URL(imv.getTag().toString());
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        protected Bitmap doInBackground(Object... params) {
+            Bitmap bitmap = null;
+
+            try {
+                bitmap = BitmapFactory.decodeStream(path.openConnection().getInputStream());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return bitmap;
+        }
+
+
+        @Override
+        protected void onPostExecute(Bitmap result) {
+//            if (!imv.getTag().equals(path)) {
+//                return;
+//            }
+
+            if (result != null && imv != null) {
+                imv.setImageBitmap(result);
+            }
         }
     }
 
@@ -186,4 +152,5 @@ public class DownloadImagesFragment extends Fragment {
             this.image = image;
         }
     }
+
 }
