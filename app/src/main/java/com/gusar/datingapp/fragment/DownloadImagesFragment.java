@@ -33,6 +33,7 @@ public class DownloadImagesFragment extends Fragment {
     ProgressBar progress;
     final int NUMBER_OF_PERSONS = Constants.getPersons().size();
     ImageView[] targetImage = new ImageView[NUMBER_OF_PERSONS];
+    int[] images = new int[NUMBER_OF_PERSONS];
 
 
     ArrayList<Person> persons = new ArrayList<Person>();
@@ -54,6 +55,19 @@ public class DownloadImagesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fr_download_images, null);
+        for (int i = 0; i < NUMBER_OF_PERSONS; i++)
+            images[i] = R.drawable.ic_launcher;
+        images[0] = R.drawable.a;
+        images[1] = R.drawable.b;
+        images[2] = R.drawable.c;
+        images[3] = R.drawable.d;
+        images[4] = R.drawable.e;
+        images[5] = R.drawable.f;
+        images[6] = R.drawable.g;
+        images[7] = R.drawable.h;
+        images[8] = R.drawable.a;
+        images[9] = R.drawable.b;
+
 
         fillData();
         diAdapter = new DownloadImagesAdapter(getActivity(), persons);
@@ -66,7 +80,7 @@ public class DownloadImagesFragment extends Fragment {
 
     private void fillData() {
         for (int i = 0; i < NUMBER_OF_PERSONS; i++) {
-            persons.add(new Person(R.drawable.ic_launcher));
+            persons.add(new Person(images[i]));
         }
     }
 
