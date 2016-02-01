@@ -1,6 +1,7 @@
 package com.gusar.datingapp.fragment;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -10,15 +11,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.gusar.datingapp.Constants;
 import com.gusar.datingapp.R;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 
 /**
  * Created by igusar on 2/1/16.
@@ -26,7 +31,13 @@ import java.net.URL;
 public class DownloadImagesFragment extends Fragment {
 
     ProgressBar progress;
-    ImageView[] targetImage = new ImageView[3];
+    final int NUMBER_OF_PERSONS = Constants.getPersons().size();
+    ImageView[] targetImage = new ImageView[NUMBER_OF_PERSONS];
+
+
+    ArrayList<Person> persons = new ArrayList<Person>();
+    DownloadImagesAdapter diAdapter;
+
     final String LOG_TAG = "myLogs";
 
     @Override
@@ -44,28 +55,19 @@ public class DownloadImagesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fr_download_images, null);
 
-        targetImage[0] = (ImageView) rootView.findViewById(R.id.target0);
-        targetImage[1] = (ImageView) rootView.findViewById(R.id.target1);
-        targetImage[2] = (ImageView) rootView.findViewById(R.id.target2);
+        fillData();
+        diAdapter = new DownloadImagesAdapter(getActivity(), persons);
 
-        progress = (ProgressBar) rootView.findViewById(R.id.progress);
-
-        String urlImage0 = "http://developer.alexanderklimov.ru/android/images/pinkhellokitty.jpg";
-        String urlImage1 = "http://developer.alexanderklimov.ru/android/images/keyboard-cat.jpg";
-        String urlImage2 = "http://developer.alexanderklimov.ru/android/images/cat-tips.jpg";
-
-        URL myURL0, myURL1, myURL2;
-
-        try {
-            myURL0 = new URL(urlImage0);
-            myURL1 = new URL(urlImage1);
-            myURL2 = new URL(urlImage2);
-            new MyAsyncTask(targetImage, progress).execute(myURL0, myURL1, myURL2);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
+        ListView lvMain = (ListView) rootView.findViewById(R.id.persons_list);
+        lvMain.setAdapter(diAdapter);
 
         return rootView;
+    }
+
+    private void fillData() {
+        for (int i = 0; i < NUMBER_OF_PERSONS; i++) {
+            persons.add(new Person(R.drawable.ic_launcher));
+        }
     }
 
     private class MyAsyncTask extends AsyncTask<URL, Integer, Void> {
@@ -127,6 +129,59 @@ public class DownloadImagesFragment extends Fragment {
                     progressBar.setProgress((values[i]+1) * 33 + 1);
                 }
             }
+        }
+    }
+
+    private class DownloadImagesAdapter extends BaseAdapter {
+        Context ctx;
+        LayoutInflater lInflater;
+        ArrayList<Person> persons;
+
+        public DownloadImagesAdapter(Context context, ArrayList<Person> persons) {
+            ctx = context;
+            this.persons = persons;
+            lInflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        }
+
+        @Override
+        public int getCount() {
+            return persons.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return persons.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View view = convertView;
+            if (view == null) {
+                view = lInflater.inflate(R.layout.item_list_image, parent, false);
+            }
+
+            Person p = getPerson(position);
+            ((ImageView) view.findViewById(R.id.image)).setImageResource(p.image);
+
+
+            return view;
+        }
+
+        Person getPerson(int position) {
+            return ((Person) getItem(position));
+        }
+    }
+
+    private class Person {
+        int image;
+
+        public Person(int image) {
+            this.image = image;
         }
     }
 }

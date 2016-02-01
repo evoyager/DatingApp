@@ -231,10 +231,10 @@ public class PersonsFragment extends DatingFragment {
 
         private void setViewHolder(View view) {
             ViewHolder vh = new ViewHolder();
-            vh.image = (ImageView) view.findViewById(R.id.image);
-            vh.heart = (ImageView) view.findViewById(R.id.heart);
-            vh.btnLike = (Button) view.findViewById(R.id.btnLike);
-            vh.btnDislike = (Button) view.findViewById(R.id.btnDislike);
+//            vh.image = (ImageView) view.findViewById(R.id.image);
+//            vh.heart = (ImageView) view.findViewById(R.id.heart);
+//            vh.btnLike = (Button) view.findViewById(R.id.btnLike);
+//            vh.btnDislike = (Button) view.findViewById(R.id.btnDislike);
             vh.needInflate = false;
             view.setTag(vh);
         }
