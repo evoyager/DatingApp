@@ -19,11 +19,13 @@ import android.widget.Toast;
 
 import com.gusar.datingapp.Constants;
 import com.gusar.datingapp.R;
+import com.gusar.datingapp.model.ModelPerson;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by igusar on 2/1/16.
@@ -31,13 +33,17 @@ import java.util.ArrayList;
 public class DownloadImagesFragment extends Fragment {
 
     ProgressBar progress;
+
     final int NUMBER_OF_PERSONS = Constants.getPersons().size();
     ImageView[] targetImage = new ImageView[NUMBER_OF_PERSONS];
     int[] images = new int[NUMBER_OF_PERSONS];
-
+    Bitmap[] aBM = new Bitmap[NUMBER_OF_PERSONS];
 
     ArrayList<Person> persons = new ArrayList<Person>();
     DownloadImagesAdapter diAdapter;
+    private List<ModelPerson> modelpersons;
+    String[] strImages = new String[NUMBER_OF_PERSONS];
+    URL[] urlImages = new URL[NUMBER_OF_PERSONS];
 
     final String LOG_TAG = "myLogs";
 
@@ -55,19 +61,7 @@ public class DownloadImagesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fr_download_images, null);
-        for (int i = 0; i < NUMBER_OF_PERSONS; i++)
-            images[i] = R.drawable.ic_launcher;
-        images[0] = R.drawable.a;
-        images[1] = R.drawable.b;
-        images[2] = R.drawable.c;
-        images[3] = R.drawable.d;
-        images[4] = R.drawable.e;
-        images[5] = R.drawable.f;
-        images[6] = R.drawable.g;
-        images[7] = R.drawable.h;
-        images[8] = R.drawable.a;
-        images[9] = R.drawable.b;
-
+        modelpersons = Constants.getPersons();
 
         fillData();
         diAdapter = new DownloadImagesAdapter(getActivity(), persons);
@@ -79,26 +73,19 @@ public class DownloadImagesFragment extends Fragment {
     }
 
     private void fillData() {
+
         for (int i = 0; i < NUMBER_OF_PERSONS; i++) {
-            persons.add(new Person(images[i]));
+            strImages[i] = modelpersons.get(i).getPhoto();
+            try {
+                urlImages[i] = new URL(strImages[i]);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
         }
+        new MyAsyncTask().execute(urlImages);
     }
 
     private class MyAsyncTask extends AsyncTask<URL, Integer, Void> {
-
-        ImageView[] aIV;
-        Bitmap[] aBM;
-        ProgressBar progressBar;
-
-        public MyAsyncTask(ImageView[] iv, ProgressBar pb) {
-            aBM = new Bitmap[iv.length];
-
-            aIV = new ImageView[iv.length];
-            for (int i = 0; i < iv.length; i++)
-                aIV[i] = iv[i];
-
-            progressBar = pb;
-        }
 
         @Override
         protected void onPreExecute() {
@@ -113,17 +100,18 @@ public class DownloadImagesFragment extends Fragment {
 
                     try {
                         aBM[i] = BitmapFactory.decodeStream(networkUrl.openConnection().getInputStream());
+                        persons.add(new Person(aBM[i]));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
 
-                    publishProgress(i);
+//                    publishProgress(i);
 
-                    try {
-                        Thread.sleep(1500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+//                    try {
+//                        Thread.sleep(1500);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
                 }
             }
 
@@ -135,15 +123,15 @@ public class DownloadImagesFragment extends Fragment {
             Toast.makeText(getActivity(), "Загрузка завершена", Toast.LENGTH_LONG).show();
         }
 
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            if (values.length > 0) {
-                for (int i = 0; i < values.length; i++) {
-                    aIV[values[i]].setImageBitmap(aBM[values[i]]);
-                    progressBar.setProgress((values[i]+1) * 33 + 1);
-                }
-            }
-        }
+//        @Override
+//        protected void onProgressUpdate(Integer... values) {
+//            if (values.length > 0) {
+//                for (int i = 0; i < values.length; i++) {
+//                    aIV[values[i]].setImageBitmap(aBM[values[i]]);
+//                    progressBar.setProgress((values[i]+1) * 33 + 1);
+//                }
+//            }
+//        }
     }
 
     private class DownloadImagesAdapter extends BaseAdapter {
@@ -180,9 +168,9 @@ public class DownloadImagesFragment extends Fragment {
             }
 
             Person p = getPerson(position);
-            ((ImageView) view.findViewById(R.id.image)).setImageResource(p.image);
+//            ((ImageView) view.findViewById(R.id.image)).setImageResource(p.image);
 
-
+            ((ImageView) view.findViewById(R.id.image)).setImageBitmap(aBM[position]);
             return view;
         }
 
@@ -192,9 +180,9 @@ public class DownloadImagesFragment extends Fragment {
     }
 
     private class Person {
-        int image;
+        Bitmap image;
 
-        public Person(int image) {
+        public Person(Bitmap image) {
             this.image = image;
         }
     }
