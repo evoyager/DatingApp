@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -31,6 +32,9 @@ import com.gusar.datingapp.R;
 import com.gusar.datingapp.adapter.MapAdapter;
 import com.gusar.datingapp.model.ModelPerson;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +44,8 @@ public class MapFragment extends DatingFragment {
     private GoogleMap map;
     private SupportMapFragment fragment;
     OnPersonsListener onPersonsListener;
-
+    URL path;
+    private static List<Bitmap> bitmaps;
     private static List<ModelPerson> PERSONS;
 
     public interface OnPersonsListener {
@@ -49,11 +54,11 @@ public class MapFragment extends DatingFragment {
 
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        try {
-            this.onPersonsListener = (OnPersonsListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement OnPersonsListener");
-        }
+//        try {
+//            this.onPersonsListener = (OnPersonsListener) activity;
+//        } catch (ClassCastException e) {
+//            throw new ClassCastException(activity.toString() + " must implement OnPersonsListener");
+//        }
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -78,44 +83,73 @@ public class MapFragment extends DatingFragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (map == null) {
-            map = fragment.getMap();
-            List<String> parseMap = new ArrayList<String>();
-            Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.a);
-            icon = icon.createScaledBitmap(icon, 100, 100, true);
-            BitmapDescriptor descriptor = BitmapDescriptorFactory.fromBitmap(icon);
-            for (ModelPerson mp: PERSONS) {
+//        new LoadImage(PERSONS).execute();
+    }
 
-                map.addMarker(new MarkerOptions().position(getLatLng(mp))
-                .icon(descriptor));
-                parseMap.add(getLatLng(mp).toString());
-            }
+    private class LoadImage extends AsyncTask<HashMap<ModelPerson, Bitmap>, Void, HashMap<ModelPerson, Bitmap>> {
+        private List<ModelPerson> persons;
+
+        public LoadImage(List<ModelPerson> persons) {
+            this.persons = persons;
         }
-        zoomCamera();
-    }
 
-    private Drawable resize(Drawable image) {
-        Bitmap b = ((BitmapDrawable)image).getBitmap();
-        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, 50, 50, false);
-        return new BitmapDrawable(getResources(), bitmapResized);
-    }
+        @Override
+        protected HashMap<ModelPerson, Bitmap> doInBackground(HashMap<ModelPerson, Bitmap>... params) {
+            for (ModelPerson person:persons) {
+                URL path = null;
+                try {
+                    path = new URL(person.getPhoto());
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    Bitmap bitmap = BitmapFactory.decodeStream(path.openConnection().getInputStream());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                zoomCamera();
+            }
+            return new HashMap();
+        }
+
+        protected void onPostExecute(HashMap<ModelPerson, Bitmap> result) {
+//            HashMap<ModelPerson, Bitmap> res;
+//            res = result;
+//            map = fragment.getMap();
+//            List<String> parseMap = new ArrayList<String>();
+//            Bitmap icon = bitmap;
+//            icon = icon.createScaledBitmap(icon, 100, 100, true);
+//            BitmapDescriptor descriptor = BitmapDescriptorFactory.fromBitmap(icon);
+//            map.addMarker(new MarkerOptions().position(getLatLng(person))
+//                    .icon(descriptor));
+//            parseMap.add(getLatLng(person).toString());
+        }
+
+        private Drawable resize(Drawable image) {
+            Bitmap b = ((BitmapDrawable)image).getBitmap();
+            Bitmap bitmapResized = Bitmap.createScaledBitmap(b, 50, 50, false);
+            return new BitmapDrawable(getResources(), bitmapResized);
+        }
 
 
-    public void zoomCamera() {
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(getLatLng(PERSONS.get(0)))
-                .zoom(12)
-                .bearing(45)
-                .tilt(20)
-                .build();
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
-        map.animateCamera(cameraUpdate);
-    }
+        public void zoomCamera() {
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(getLatLng(PERSONS.get(0)))
+                    .zoom(12)
+                    .bearing(45)
+                    .tilt(20)
+                    .build();
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
+            map.animateCamera(cameraUpdate);
+        }
 
-    private LatLng getLatLng(ModelPerson person) {
-        String[] splitLocation = person.getLocation().split(",");
-        Double lat = Double.parseDouble(splitLocation[0]);
-        Double lon = Double.parseDouble(splitLocation[1]);
-        return new LatLng(lat, lon);
+        private LatLng getLatLng(ModelPerson person) {
+            String[] splitLocation = person.getLocation().split(",");
+            Double lat = Double.parseDouble(splitLocation[0]);
+            Double lon = Double.parseDouble(splitLocation[1]);
+            return new LatLng(lat, lon);
+        }
     }
 }

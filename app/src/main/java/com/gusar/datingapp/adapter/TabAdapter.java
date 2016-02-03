@@ -6,7 +6,6 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.gusar.datingapp.fragment.DownloadImagesFragment;
 import com.gusar.datingapp.fragment.MapFragment;
-import com.gusar.datingapp.fragment.PersonsFragment;
 
 /**
  * Created by igusar on 1/27/16.

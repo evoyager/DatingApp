@@ -1,5 +1,7 @@
 package com.gusar.datingapp;
 
+import android.graphics.Bitmap;
+
 import com.gusar.datingapp.model.ModelPerson;
 
 import java.util.ArrayList;
@@ -35,17 +37,24 @@ public final class Constants {
             "https://lh5.googleusercontent.com/-Oh8mMy2ieng/URqullDwehI/AAAAAAAAAbs/TbdeEfsaIZY/s1024/Despair.jpg"};
 
     private static int page_num = 0;
+    private static List<ModelPerson> PERSONS = new ArrayList<ModelPerson>();
+    private static Map<Integer, Boolean> liked = new HashMap<Integer, Boolean>();
+    private static List<Bitmap> bitmaps = new ArrayList<Bitmap>();
+
+    public static void addBitmap(Bitmap new_bitmap) {
+        bitmaps.add(new_bitmap);
+    }
+
+    public static List<Bitmap> getBitmaps() {
+        return bitmaps;
+    }
 
     public static void setPageNum(int page_number) {
         page_num = page_number;
     }
-
     public static int getPageNum() {
         return page_num++;
     }
-
-    private static List<ModelPerson> PERSONS = new ArrayList<ModelPerson>();
-    private static Map<Integer, Boolean> liked = new HashMap<Integer, Boolean>();
 
     public static void changeLikeStatus(Integer id, boolean like) {
         if (like)

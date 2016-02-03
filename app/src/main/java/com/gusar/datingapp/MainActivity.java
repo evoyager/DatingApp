@@ -1,31 +1,27 @@
 package com.gusar.datingapp;
 
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.gusar.datingapp.fragment.PersonsFragment;
 import com.gusar.datingapp.model.ModelPerson;
-import com.nostra13.universalimageloader.utils.L;
 
 import org.testpackage.test_sdk.android.testlib.API;
 import org.testpackage.test_sdk.android.testlib.interfaces.PersonsExtendedCallback;
 import org.testpackage.test_sdk.android.testlib.interfaces.SuccessCallback;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +35,7 @@ public class MainActivity extends Activity {
     static ProgressDialog mProgressDialog;
     List<ModelPerson> persons;
     Button btnGenerate;
+    private static final int REQUEST_STORAGE = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,13 +46,16 @@ public class MainActivity extends Activity {
         btnGenerate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                File testImageOnSdCard = new File("/mnt/sdcard", TEST_FILE_NAME);
-                if (!testImageOnSdCard.exists()) {
-                    copyTestImageToSdCard(testImageOnSdCard);
-                }
-                new DownloadJSON(getApplicationContext()).execute();
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        REQUEST_STORAGE);
+
             }
         });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        new DownloadJSON(getApplicationContext()).execute();
     }
 
     private class DownloadJSON extends AsyncTask<Void, Void, Void> {
@@ -114,40 +114,6 @@ public class MainActivity extends Activity {
             Intent intent = new Intent(context, DatingActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
-
-//            setTitle(R.string.app_name);
-//            fr = new PersonsFragment();
-//            tag = PersonsFragment.class.getSimpleName();
-//            getSupportFragmentManager().beginTransaction()
-//                    .replace(android.R.id.content, fr, tag)
-//                    .addToBackStack("fr_persons")
-//                    .commit();
         }
-
-    }
-
-    private void copyTestImageToSdCard(final File testImageOnSdCard) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    InputStream is = getAssets().open(TEST_FILE_NAME);
-                    FileOutputStream fos = new FileOutputStream(testImageOnSdCard);
-                    byte[] buffer = new byte[8192];
-                    int read;
-                    try {
-                        while((read = is.read(buffer)) != -1) {
-                            fos.write(buffer, 0, read);
-                        }
-                    } finally {
-                        fos.flush();
-                        fos.close();
-                        is.close();
-                    }
-                } catch (IOException e) {
-                    L.w("Can't copy test image onto SD card");
-                }
-            }
-        }).start();
     }
 }
