@@ -9,15 +9,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     class="com.google.android.gms.maps.SupportMapFragment" />
-    <ImageView
-        android:id="@+id/photooo"
-        android:visibility="invisible"
-        android:layout_width="360dip"
-        android:layout_height="360dip"
-        android:layout_margin="3dip"
-        android:adjustViewBounds="true"
-        android:contentDescription="Image"
-        android:scaleType="centerCrop" />
 
 
 </RelativeLayout>

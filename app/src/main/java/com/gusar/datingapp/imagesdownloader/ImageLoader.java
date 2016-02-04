@@ -60,8 +60,6 @@ public class ImageLoader {
     }
 
     public Bitmap getBitmap(String url) {
-//        new getBitmapTask(url).execute();
-//        return taskBitmap;
         File f = fileCache.getFile(url);
 
         Bitmap b = decodeFile(f);
