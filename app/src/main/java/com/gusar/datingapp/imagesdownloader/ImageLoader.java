@@ -30,8 +30,10 @@ public class ImageLoader {
     ExecutorService executorService;
     // Handler to display images in UI thread
     Handler handler = new Handler();
+    Context context;
 
     public ImageLoader(Context context) {
+        this.context = context;
         fileCache = new FileCache(context);
         executorService = Executors.newFixedThreadPool(5);
     }
@@ -54,7 +56,7 @@ public class ImageLoader {
         executorService.submit(new PhotosLoader(p));
     }
 
-    private Bitmap getBitmap(String url) {
+    public Bitmap getBitmap(String url) {
         File f = fileCache.getFile(url);
 
         Bitmap b = decodeFile(f);
@@ -97,7 +99,7 @@ public class ImageLoader {
 
             // Find the correct scale value. It should be the power of 2.
             // Recommended Size 512
-            final int REQUIRED_SIZE = 70;
+            final int REQUIRED_SIZE = 512;
             int width_tmp = o.outWidth, height_tmp = o.outHeight;
             int scale = 1;
             while (true) {
@@ -157,6 +159,7 @@ public class ImageLoader {
             }
         }
     }
+
 
     boolean imageViewReused(PhotoToLoad photoToLoad) {
         String tag = imageViews.get(photoToLoad.imageView);

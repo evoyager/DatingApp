@@ -4,16 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.gusar.datingapp.MainActivity;
+import com.google.android.gms.maps.GoogleMap;
 import com.gusar.datingapp.R;
 import com.gusar.datingapp.imagesdownloader.ImageLoader;
 
@@ -25,6 +22,7 @@ public class ListViewAdapter extends BaseAdapter {
     ArrayList<HashMap<String, String>> data;
     ImageLoader imageLoader;
     HashMap<String, String> resultp = new HashMap<String, String>();
+    private GoogleMap map;
 
     public ListViewAdapter(Context context,
                            ArrayList<HashMap<String, String>> arraylist) {

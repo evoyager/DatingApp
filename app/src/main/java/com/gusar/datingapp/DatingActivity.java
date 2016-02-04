@@ -53,7 +53,6 @@ public class DatingActivity extends ActionBarActivity  {
         this.tabAdapter = new TabAdapter(this.fragmentManager, 2);
         viewPager.setAdapter(this.tabAdapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-//        this.personsFragment = (PersonsFragment) this.tabAdapter.getItem(0);
         this.personsFragment = (DownloadImagesFragment) this.tabAdapter.getItem(0);
         this.mapFragment = (MapFragment) this.tabAdapter.getItem(1);
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
