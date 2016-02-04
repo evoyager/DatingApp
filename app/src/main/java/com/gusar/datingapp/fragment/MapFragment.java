@@ -7,6 +7,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -32,6 +34,8 @@ import com.gusar.datingapp.model.ModelPerson;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class MapFragment extends DatingFragment {
     private GoogleMap map;
@@ -39,6 +43,7 @@ public class MapFragment extends DatingFragment {
     private static List<ModelPerson> PERSONS;
     ImageLoader loader;
     ImageView photo;
+    Bitmap icon;
 
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -71,15 +76,25 @@ public class MapFragment extends DatingFragment {
         super.onResume();
         if (map == null) {
             map = fragment.getMap();
-            List<String> parseMap = new ArrayList<String>();
+            final List<String> parseMap = new ArrayList<String>();
 
-            for (ModelPerson mp: PERSONS) {
-                Bitmap icon = loader.getBitmap(mp.getPhoto());
-                icon = icon.createScaledBitmap(icon, 100, 100, true);
-                BitmapDescriptor descriptor = BitmapDescriptorFactory.fromBitmap(icon);
-                map.addMarker(new MarkerOptions().position(getLatLng(mp))
-                        .icon(descriptor));
-                parseMap.add(getLatLng(mp).toString());
+            for (final ModelPerson mp: PERSONS) {
+                Executor executor = Executors.newSingleThreadExecutor();
+                executor.execute(new Runnable() { public void run() {
+                    icon = loader.getBitmap(mp.getPhoto());
+                    icon = icon.createScaledBitmap(icon, 100, 100, true);
+                    final BitmapDescriptor descriptor = BitmapDescriptorFactory.fromBitmap(icon);
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    handler.post(new Runnable(){
+                                     @Override
+                                     public void run() {
+                                         map.addMarker(new MarkerOptions().position(getLatLng(mp))
+                                                 .icon(descriptor));
+                                     }
+                                 });
+
+                    parseMap.add(getLatLng(mp).toString());
+                } });
             }
         }
         zoomCamera();

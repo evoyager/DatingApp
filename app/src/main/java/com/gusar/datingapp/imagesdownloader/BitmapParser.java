@@ -23,7 +23,7 @@ import android.graphics.BitmapFactory;
 import android.widget.ImageView;
 import com.gusar.datingapp.R;
 
-public class ImageLoader {
+public class BitmapParser {
 
     MemoryCache memoryCache = new MemoryCache();
     FileCache fileCache;
@@ -35,7 +35,7 @@ public class ImageLoader {
     Context context;
     Bitmap taskBitmap;
 
-    public ImageLoader(Context context) {
+    public BitmapParser(Context context) {
         this.context = context;
         fileCache = new FileCache(context);
         executorService = Executors.newFixedThreadPool(5);
@@ -60,36 +60,8 @@ public class ImageLoader {
     }
 
     public Bitmap getBitmap(String url) {
-//        new getBitmapTask(url).execute();
-//        return taskBitmap;
-        File f = fileCache.getFile(url);
-
-        Bitmap b = decodeFile(f);
-        if (b != null)
-            return b;
-
-        // Download Images from the Internet
-        try {
-            Bitmap bitmap = null;
-            URL imageUrl = new URL(url);
-            HttpURLConnection conn = (HttpURLConnection) imageUrl
-                    .openConnection();
-            conn.setConnectTimeout(30000);
-            conn.setReadTimeout(30000);
-            conn.setInstanceFollowRedirects(true);
-            InputStream is = conn.getInputStream();
-            OutputStream os = new FileOutputStream(f);
-            Utils.CopyStream(is, os);
-            os.close();
-            conn.disconnect();
-            bitmap = decodeFile(f);
-            return bitmap;
-        } catch (Throwable ex) {
-            ex.printStackTrace();
-            if (ex instanceof OutOfMemoryError)
-                memoryCache.clear();
-            return null;
-        }
+        new getBitmapTask(url).execute();
+        return taskBitmap;
     }
 
     class getBitmapTask extends AsyncTask<String, Void, Bitmap> {
