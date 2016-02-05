@@ -19,6 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.gusar.datingapp.Constants;
+import com.gusar.datingapp.MyCell;
 import com.gusar.datingapp.R;
 import com.gusar.datingapp.adapter.ListViewAdapter;
 import com.gusar.datingapp.model.ModelPerson;
@@ -38,8 +39,8 @@ public class DownloadImagesFragment extends Fragment {
 
     ListView listview;
     ListViewAdapter adapter;
-    ArrayList<HashMap<String, String>> arraylist;
     private List<ModelPerson> persons;
+    private static List<MyCell> mAnimList = new ArrayList<MyCell>();
 
     @Override
     public void onAttach(Activity activity) {
@@ -52,19 +53,11 @@ public class DownloadImagesFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fr_download_images, null);
+        View rootView = inflater.inflate(R.layout.fr_download_images,  container, false);
 
         persons = Constants.getPersons();
         listview = (ListView) rootView.findViewById(R.id.listview);
-        arraylist = new ArrayList<HashMap<String, String>>();
-
-        for (int i = 0; i < persons.size(); i++) {
-            HashMap<String, String> map = new HashMap<>();
-            map.put("photo", persons.get(i).getPhoto());
-            arraylist.add(map);
-        }
-
-        adapter = new ListViewAdapter(getActivity(), arraylist);
+        adapter = new ListViewAdapter(getActivity(), R.layout.listview_item, mAnimList);
         listview.setAdapter(adapter);
 
         return rootView;

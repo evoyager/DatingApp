@@ -52,8 +52,6 @@ public class MapFragment extends DatingFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fr_maps, container, false);
         loader = new ImageLoader(getActivity());
-        photo = (ImageView) v.findViewById(R.id.photooo);
-
         return v;
     }
 
