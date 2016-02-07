@@ -4,7 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.GestureDetectorCompat;
+import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -34,6 +38,9 @@ public class PersonsFragment extends Fragment {
     private ImageAdapter mMyAnimListAdapter;
     private ModelPerson currentPerson;
     ImageLoader imageLoader;
+    private GestureDetector mDetector;
+    int uiOptions;
+    boolean touched = false;
 
     @Override
     public void onAttach(Activity activity) {
@@ -49,6 +56,37 @@ public class PersonsFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fr_download_images,  container, false);
 
         persons = Constants.getPersons();
+
+
+        final View decorView = getActivity().getWindow().getDecorView();
+
+        final GestureDetector gesture = new GestureDetector(getActivity(),
+                new GestureDetector.SimpleOnGestureListener() {
+
+                    @Override
+                    public boolean onSingleTapUp(MotionEvent e) {
+                        if (!touched) {
+                            uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                                    | View.SYSTEM_UI_FLAG_IMMERSIVE;
+                        } else {
+                            uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+                        }
+
+                        decorView.setSystemUiVisibility(uiOptions);
+                        touched = !touched;
+
+                        return super.onSingleTapUp(e);
+                    }
+                });
+
+        rootView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return gesture.onTouchEvent(event);
+            }
+        });
 
         for (int i = 0; i < persons.size(); i++) {
             MyCell cell = new MyCell();
