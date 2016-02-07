@@ -4,6 +4,10 @@ package com.gusar.datingapp.fragment;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BitmapShader;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -36,6 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import static java.lang.Math.min;
 
 public class MapFragment extends DatingFragment {
     private GoogleMap map;
@@ -81,6 +86,7 @@ public class MapFragment extends DatingFragment {
                 executor.execute(new Runnable() { public void run() {
                     icon = loader.getBitmap(mp.getPhoto());
                     icon = icon.createScaledBitmap(icon, 100, 100, true);
+                    icon = circleBitmap(icon);
                     final BitmapDescriptor descriptor = BitmapDescriptorFactory.fromBitmap(icon);
                     Handler handler = new Handler(Looper.getMainLooper());
                     handler.post(new Runnable(){
@@ -96,6 +102,20 @@ public class MapFragment extends DatingFragment {
             }
         }
         zoomCamera();
+    }
+
+    private Bitmap circleBitmap(Bitmap b) {
+        Bitmap bitmap = b;
+
+        Bitmap circleBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+
+        BitmapShader shader = new BitmapShader (bitmap,  Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+        Paint paint = new Paint();
+        paint.setShader(shader);
+        paint.setAntiAlias(true);
+        Canvas c = new Canvas(circleBitmap);
+        c.drawCircle(bitmap.getWidth()/2, bitmap.getHeight()/2, min(bitmap.getWidth(), bitmap.getHeight())/2, paint);
+        return circleBitmap;
     }
 
     public void zoomCamera() {

@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file:///cryptfs/git/DatingApp/DatingApp.iml" filepath="/cryptfs/git/DatingApp/DatingApp.iml" />
-      <module fileurl="file:///cryptfs/git/DatingApp/app/app.iml" filepath="/cryptfs/git/DatingApp/app/app.iml" />
-      <module fileurl="file:///cryptfs/git/DatingApp/testlib/testlib.iml" filepath="/cryptfs/git/DatingApp/testlib/testlib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/DatingApp.iml" filepath="$PROJECT_DIR$/DatingApp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/testlib/testlib.iml" filepath="$PROJECT_DIR$/testlib/testlib.iml" />
     </modules>
   </component>
 </project>

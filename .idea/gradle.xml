@@ -7,16 +7,16 @@
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
-            <option value="/cryptfs/git/DatingApp" />
-            <option value="/cryptfs/git/DatingApp/app" />
-            <option value="/cryptfs/git/DatingApp/testlib" />
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/testlib" />
           </set>
         </option>
         <option name="myModules">
           <set>
-            <option value="/cryptfs/git/DatingApp" />
-            <option value="/cryptfs/git/DatingApp/app" />
-            <option value="/cryptfs/git/DatingApp/testlib" />
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/testlib" />
           </set>
         </option>
       </GradleProjectSettings>
