@@ -3,20 +3,15 @@ package com.gusar.datingapp.fragment;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Shader;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,7 +37,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import static java.lang.Math.min;
 
-public class MapFragment extends DatingFragment {
+public class MapFragment extends Fragment {
     private GoogleMap map;
     private SupportMapFragment fragment;
     private static List<ModelPerson> PERSONS;
@@ -63,7 +58,6 @@ public class MapFragment extends DatingFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-//        FragmentManager fm = getChildFragmentManager();
         FragmentManager fm = getActivity().getSupportFragmentManager();
         fragment = (SupportMapFragment) fm.findFragmentById(R.id.map);
         if (fragment == null) {

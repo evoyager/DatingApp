@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * Created by igusar on 2/1/16.
  */
-public class DownloadImagesFragment extends Fragment {
+public class PersonsFragment extends Fragment {
 
     static final int ANIMATION_DURATION = 200;
     protected ListView listView;
