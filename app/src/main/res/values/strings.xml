@@ -9,4 +9,6 @@
     <string name="btnDislike">dislike</string>
     <string name="btnLike">like</string>
     <string name="btnGenerate">generate</string>
+    <string name="back">Back</string>
+    <string name="congr">Congratulation!</string>
 </resources>
