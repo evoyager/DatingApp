@@ -95,7 +95,7 @@ public class PersonsFragment extends Fragment {
             mAnimList.add(cell);
         }
 
-        mMyAnimListAdapter = new ImageAdapter(getActivity(), R.layout.listview_item, mAnimList);
+        mMyAnimListAdapter = new ImageAdapter(getActivity(), R.layout.listview_item, persons);
         listView = (ListView) rootView.findViewById(R.id.listview);
         (listView).setAdapter(mMyAnimListAdapter);
 
@@ -158,17 +158,28 @@ public class PersonsFragment extends Fragment {
         super.onResume();
     }
 
-    public class ImageAdapter extends ArrayAdapter<MyCell> {
+    public class ImageAdapter extends ArrayAdapter<ModelPerson> {
 
         private LayoutInflater inflater;
         private int resId;
 
-        public ImageAdapter(Context context, int textViewResourceId, List<MyCell> objects) {
+        public ImageAdapter(Context context, int textViewResourceId, List<ModelPerson> objects) {
             super(context, textViewResourceId, objects);
 
             this.resId = textViewResourceId;
             this.inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             imageLoader = new ImageLoader(context);
+        }
+
+        @Override
+        public int getCount()
+        {
+            return persons.size();
+        }
+
+        @Override
+        public ModelPerson getItem (int pos){
+            return persons.get(pos);
         }
 
         @Override
@@ -209,11 +220,11 @@ public class PersonsFragment extends Fragment {
                 public void onClick(View v) {
                     currentPerson = persons.get(position);
                     Constants.changeLikeStatus(currentPerson.getId(), true);
-                    Intent intent = new Intent(getActivity(), MatchActivity.class);
-                    intent.putExtra("url", currentPerson.getPhoto());
+//                    Intent intent = new Intent(getActivity(), MatchActivity.class);
+//                    intent.putExtra("url", currentPerson.getPhoto());
                     holder.heart.setVisibility(View.VISIBLE);
                     deleteCell(view, position);
-                    startActivity(intent);
+//                    startActivity(intent);
                 }
             });
             photo = (ImageView) view.findViewById(R.id.photo);

@@ -48,7 +48,6 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                         REQUEST_STORAGE);
-
             }
         });
     }
