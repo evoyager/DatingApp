@@ -56,11 +56,10 @@ public class PersonsFragment extends Fragment {
 
         persons = Constants.getPersons();
 
-
-        final View decorView = getActivity().getWindow().getDecorView();
-        uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-        decorView.setSystemUiVisibility(uiOptions);
+//        final View decorView = getActivity().getWindow().getDecorView();
+//        uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+//                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+//        decorView.setSystemUiVisibility(uiOptions);
 
         mMyAnimListAdapter = new ImageAdapter(getActivity(), R.layout.listview_item, persons);
         listView = (ListView) rootView.findViewById(R.id.listview);
@@ -81,7 +80,7 @@ public class PersonsFragment extends Fragment {
                 mMyAnimListAdapter.notifyDataSetChanged();
 
                 if(persons.size() == 0) {
-                    getActivity().finish();
+                    getFragmentManager().popBackStack();
                 }
             }
 

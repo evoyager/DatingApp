@@ -11,11 +11,20 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
+import android.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.gusar.datingapp.fragment.MapFragment;
+import com.gusar.datingapp.fragment.PersonsFragment;
 import com.gusar.datingapp.model.ModelPerson;
 
 import org.testpackage.test_sdk.android.testlib.API;
@@ -27,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends FragmentActivity implements ActionBar.TabListener {
 
     private static final String TEST_FILE_NAME = "Universal Image Loader @#&=+-_.,!()~'%20.png";
     Fragment fr;
@@ -36,6 +45,8 @@ public class MainActivity extends Activity {
     List<ModelPerson> persons;
     Button btnGenerate;
     private static final int REQUEST_STORAGE = 0;
+    AppSectionsPagerAdapter mAppSectionsPagerAdapter;
+    ViewPager mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +66,21 @@ public class MainActivity extends Activity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         new DownloadJSON(getApplicationContext()).execute();
+    }
+
+    @Override
+    public void onTabSelected(ActionBar.Tab tab, android.app.FragmentTransaction ft) {
+
+    }
+
+    @Override
+    public void onTabUnselected(ActionBar.Tab tab, android.app.FragmentTransaction ft) {
+
+    }
+
+    @Override
+    public void onTabReselected(ActionBar.Tab tab, android.app.FragmentTransaction ft) {
+
     }
 
     private class DownloadJSON extends AsyncTask<Void, Void, Void> {
@@ -107,12 +133,69 @@ public class MainActivity extends Activity {
         @Override
         protected void onPostExecute(Void args) {
             mProgressDialog.dismiss();
-
             super.onPostExecute(args);
-            MainActivity.mProgressDialog.dismiss();
-            Intent intent = new Intent(context, DatingActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(intent);
+
+//            Intent intent = new Intent(context, DatingActivity.class);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//            context.startActivity(intent);
+
+            mAppSectionsPagerAdapter = new AppSectionsPagerAdapter(getSupportFragmentManager());
+
+            final ActionBar actionBar = getActionBar();
+
+            actionBar.setHomeButtonEnabled(false);
+
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+            mViewPager = (ViewPager) findViewById(R.id.pagerr);
+            mViewPager.setAdapter(mAppSectionsPagerAdapter);
+            mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+                @Override
+                public void onPageSelected(int position) {
+                    actionBar.setSelectedNavigationItem(position);
+                }
+            });
+
+            for (int i = 0; i < mAppSectionsPagerAdapter.getCount(); i++) {
+                actionBar.addTab(
+                        actionBar.newTab()
+                                .setText(mAppSectionsPagerAdapter.getPageTitle(i))
+                                .setTabListener(MainActivity.this));
+            }
+
+        }
+    }
+
+    public static class AppSectionsPagerAdapter extends FragmentPagerAdapter {
+
+
+        public AppSectionsPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int i) {
+            switch(i) {
+                case 0:
+                    return new PersonsFragment();
+                default:
+                    return new MapFragment();
+            }
+        }
+
+        @Override
+        public int getCount() {
+            return 2;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int i) {
+            switch(i) {
+                case 0:
+                    return "Persons";
+                default:
+                    return "Map";
+            }
         }
     }
 }

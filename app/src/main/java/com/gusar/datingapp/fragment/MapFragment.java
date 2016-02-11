@@ -113,14 +113,16 @@ public class MapFragment extends Fragment {
     }
 
     public void zoomCamera() {
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(getLatLng(PERSONS.get(0)))
-                .zoom(12)
-                .bearing(45)
-                .tilt(20)
-                .build();
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
-        map.animateCamera(cameraUpdate);
+        try {
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(getLatLng(PERSONS.get(0)))
+                    .zoom(12)
+                    .bearing(45)
+                    .tilt(20)
+                    .build();
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
+            map.animateCamera(cameraUpdate);
+        } catch (IndexOutOfBoundsException e) {}
     }
 
     private LatLng getLatLng(ModelPerson person) {
