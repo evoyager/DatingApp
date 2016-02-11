@@ -35,14 +35,11 @@ public class PersonsFragment extends Fragment {
 
     static final int ANIMATION_DURATION = 200;
     protected ListView listView;
-    private static List<MyCell> mAnimList = new ArrayList<MyCell>();
     private List<ModelPerson> persons;
     private ImageAdapter mMyAnimListAdapter;
     private ModelPerson currentPerson;
     ImageLoader imageLoader;
-    private GestureDetector mDetector;
     int uiOptions;
-    boolean touched = false;
 
     @Override
     public void onAttach(Activity activity) {
@@ -61,39 +58,9 @@ public class PersonsFragment extends Fragment {
 
 
         final View decorView = getActivity().getWindow().getDecorView();
-
-        final GestureDetector gesture = new GestureDetector(getActivity(),
-                new GestureDetector.SimpleOnGestureListener() {
-
-                    @Override
-                    public boolean onSingleTapUp(MotionEvent e) {
-                        if (!touched) {
-                            uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
-                                    | View.SYSTEM_UI_FLAG_IMMERSIVE;
-                        } else {
-                            uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
-                        }
-
-                        decorView.setSystemUiVisibility(uiOptions);
-                        touched = !touched;
-
-                        return super.onSingleTapUp(e);
-                    }
-                });
-
-        rootView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return gesture.onTouchEvent(event);
-            }
-        });
-
-        for (int i = 0; i < persons.size(); i++) {
-            MyCell cell = new MyCell();
-            mAnimList.add(cell);
-        }
+        uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+        decorView.setSystemUiVisibility(uiOptions);
 
         mMyAnimListAdapter = new ImageAdapter(getActivity(), R.layout.listview_item, persons);
         listView = (ListView) rootView.findViewById(R.id.listview);
@@ -106,7 +73,6 @@ public class PersonsFragment extends Fragment {
         Animation.AnimationListener al = new Animation.AnimationListener() {
             @Override
             public void onAnimationEnd(Animation animation) {
-                mAnimList.remove(index);
                 persons.remove(index);
 
                 ViewHolder vh = (ViewHolder)v.getTag();
@@ -114,7 +80,7 @@ public class PersonsFragment extends Fragment {
 
                 mMyAnimListAdapter.notifyDataSetChanged();
 
-                if(mAnimList.size() == 0) {
+                if(persons.size() == 0) {
                     getActivity().finish();
                 }
             }
@@ -252,6 +218,4 @@ public class PersonsFragment extends Fragment {
         Button btnLike;
     }
 
-    private static class MyCell {
-    }
 }
