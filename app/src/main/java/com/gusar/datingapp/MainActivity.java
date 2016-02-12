@@ -15,16 +15,20 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.gusar.datingapp.fragment.MapFragment;
+import com.gusar.datingapp.fragment.PageFragment;
 import com.gusar.datingapp.fragment.PersonsFragment;
+import com.gusar.datingapp.fragment.ViewPagerFragment;
 import com.gusar.datingapp.model.ModelPerson;
 
 import org.testpackage.test_sdk.android.testlib.API;
@@ -45,13 +49,21 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     List<ModelPerson> persons;
     Button btnGenerate;
     private static final int REQUEST_STORAGE = 0;
-    AppSectionsPagerAdapter mAppSectionsPagerAdapter;
+//    AppSectionsPagerAdapter mAppSectionsPagerAdapter;
     ViewPager mViewPager;
+    static final int PAGE_COUNT = 2;
+    static final String TAG = "myLogs";
+    Button genBtn;
+
+//    ViewPager pager;
+//    PagerAdapter pagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        genBtn = (Button)findViewById(R.id.btnGenerate);
 
         btnGenerate = (Button) findViewById(R.id.btnGenerate);
         btnGenerate.setOnClickListener(new View.OnClickListener() {
@@ -70,7 +82,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
     @Override
     public void onTabSelected(ActionBar.Tab tab, android.app.FragmentTransaction ft) {
-
+        mViewPager.setCurrentItem(tab.getPosition());
     }
 
     @Override
@@ -80,6 +92,14 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
     @Override
     public void onTabReselected(ActionBar.Tab tab, android.app.FragmentTransaction ft) {
+
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        super.onBackPressed();
+        btnGenerate.setVisibility(View.VISIBLE);
 
     }
 
@@ -135,67 +155,114 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
             mProgressDialog.dismiss();
             super.onPostExecute(args);
 
-//            Intent intent = new Intent(context, DatingActivity.class);
-//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//            context.startActivity(intent);
+            setTitle(R.string.app_name);
+            fr = new ViewPagerFragment();
+            tag = PersonsFragment.class.getSimpleName();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(android.R.id.content, fr, tag)
+                    .addToBackStack("fr_image_list")
+                    .commit();
 
-            mAppSectionsPagerAdapter = new AppSectionsPagerAdapter(getSupportFragmentManager());
+            btnGenerate.setVisibility(View.GONE);
+//
+//            mAppSectionsPagerAdapter = new AppSectionsPagerAdapter(getSupportFragmentManager());
+//
+//            final ActionBar actionBar = getActionBar();
+//
+//            actionBar.setHomeButtonEnabled(false);
+//
+//            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+//
+//            mViewPager = (ViewPager) findViewById(R.id.pager);
+//            mViewPager.setAdapter(mAppSectionsPagerAdapter);
+//            mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+//                @Override
+//                public void onPageSelected(int position) {
+//                    actionBar.setSelectedNavigationItem(position);
+//                }
+//            });
+//
+//            for (int i = 0; i < mAppSectionsPagerAdapter.getCount(); i++) {
+//                actionBar.addTab(
+//                        actionBar.newTab()
+//                                .setText(mAppSectionsPagerAdapter.getPageTitle(i))
+//                                .setTabListener(MainActivity.this));
+//            }
 
-            final ActionBar actionBar = getActionBar();
+//            ===========================================================================
 
-            actionBar.setHomeButtonEnabled(false);
-
-            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
-            mViewPager = (ViewPager) findViewById(R.id.pagerr);
-            mViewPager.setAdapter(mAppSectionsPagerAdapter);
-            mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-                @Override
-                public void onPageSelected(int position) {
-                    actionBar.setSelectedNavigationItem(position);
-                }
-            });
-
-            for (int i = 0; i < mAppSectionsPagerAdapter.getCount(); i++) {
-                actionBar.addTab(
-                        actionBar.newTab()
-                                .setText(mAppSectionsPagerAdapter.getPageTitle(i))
-                                .setTabListener(MainActivity.this));
-            }
-
+//            pager = (ViewPager) findViewById(R.id.pager);
+//            pagerAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager());
+//            pager.setAdapter(pagerAdapter);
+//
+//            pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+//
+//                @Override
+//                public void onPageSelected(int position) {
+//                    Log.d(TAG, "onPageSelected, position = " + position);
+//                }
+//
+//                @Override
+//                public void onPageScrolled(int position, float positionOffset,
+//                                           int positionOffsetPixels) {
+//                }
+//
+//                @Override
+//                public void onPageScrollStateChanged(int state) {
+//                }
+//            });
         }
+
+//        private class MyFragmentPagerAdapter extends FragmentPagerAdapter {
+//
+//            public MyFragmentPagerAdapter(FragmentManager fm) {
+//                super(fm);
+//            }
+//
+//            @Override
+//            public Fragment getItem(int position) {
+//                return PageFragment.newInstance(position);
+//            }
+//
+//            @Override
+//            public int getCount() {
+//                return PAGE_COUNT;
+//            }
+//        }
     }
 
-    public static class AppSectionsPagerAdapter extends FragmentPagerAdapter {
-
-
-        public AppSectionsPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int i) {
-            switch(i) {
-                case 0:
-                    return new PersonsFragment();
-                default:
-                    return new MapFragment();
-            }
-        }
-
-        @Override
-        public int getCount() {
-            return 2;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int i) {
-            switch(i) {
-                case 0:
-                    return "Persons";
-                default:
-                    return "Map";
-            }
-        }
-    }
+//    public static class AppSectionsPagerAdapter extends FragmentPagerAdapter {
+//
+//
+//        public AppSectionsPagerAdapter(FragmentManager fm) {
+//            super(fm);
+//        }
+//
+//        @Override
+//        public Fragment getItem(int i) {
+//            switch(i) {
+//                case 0:
+//                    return new PersonsFragment();
+//                default:
+//                    return new MapFragment();
+//            }
+//        }
+//
+//        @Override
+//        public int getCount() {
+//            return 2;
+//        }
+//
+//        @Override
+//        public CharSequence getPageTitle(int i) {
+//            switch(i) {
+//                case 0:
+//                    return "Persons";
+//                default:
+//                    return "Map";
+//            }
+//        }
+//    }
 }
+
+

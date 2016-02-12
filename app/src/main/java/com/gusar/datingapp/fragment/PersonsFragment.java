@@ -40,6 +40,7 @@ public class PersonsFragment extends Fragment {
     private ModelPerson currentPerson;
     ImageLoader imageLoader;
     int uiOptions;
+    Button btnGenerate;
 
     @Override
     public void onAttach(Activity activity) {
@@ -53,6 +54,7 @@ public class PersonsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fr_download_images,  container, false);
+//        btnGenerate = (Button) findViewById(R.id.btnGenerate);
 
         persons = Constants.getPersons();
 
@@ -80,7 +82,7 @@ public class PersonsFragment extends Fragment {
                 mMyAnimListAdapter.notifyDataSetChanged();
 
                 if(persons.size() == 0) {
-                    getFragmentManager().popBackStack();
+                    getActivity().onBackPressed();
                 }
             }
 
@@ -216,5 +218,4 @@ public class PersonsFragment extends Fragment {
         Button btnDislike;
         Button btnLike;
     }
-
 }

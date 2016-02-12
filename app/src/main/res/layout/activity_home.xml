@@ -10,9 +10,4 @@
         android:text="@string/btnGenerate"
         android:id="@+id/btnGenerate"
         android:layout_gravity="center" />
-
-    <android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/pagerr"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 </FrameLayout>
