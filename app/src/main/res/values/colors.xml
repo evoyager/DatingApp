@@ -8,4 +8,6 @@
     <color name="gray_50">#fafafa</color>
     <color name="dark_toolbar">#1f1f1f</color>
     <color name="dark_backgr">#2e2e2e</color>
+
+    <color name="tabsScrollColor">#8a140e</color>
 </resources>

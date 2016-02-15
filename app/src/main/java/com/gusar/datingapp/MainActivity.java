@@ -2,45 +2,38 @@ package com.gusar.datingapp;
 
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ViewAnimator;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.gusar.datingapp.fragment.MapFragment;
-import com.gusar.datingapp.fragment.PageFragment;
 import com.gusar.datingapp.fragment.PersonsFragment;
 import com.gusar.datingapp.fragment.ViewPagerFragment;
 import com.gusar.datingapp.model.ModelPerson;
-
 import org.testpackage.test_sdk.android.testlib.API;
 import org.testpackage.test_sdk.android.testlib.interfaces.PersonsExtendedCallback;
 import org.testpackage.test_sdk.android.testlib.interfaces.SuccessCallback;
-
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends FragmentActivity implements ActionBar.TabListener {
+public class MainActivity extends FragmentActivity {
 
     private static final String TEST_FILE_NAME = "Universal Image Loader @#&=+-_.,!()~'%20.png";
     Fragment fr;
@@ -49,14 +42,12 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     List<ModelPerson> persons;
     Button btnGenerate;
     private static final int REQUEST_STORAGE = 0;
-//    AppSectionsPagerAdapter mAppSectionsPagerAdapter;
     ViewPager mViewPager;
     static final int PAGE_COUNT = 2;
     static final String TAG = "myLogs";
     Button genBtn;
 
-//    ViewPager pager;
-//    PagerAdapter pagerAdapter;
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,23 +67,25 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         new DownloadJSON(getApplicationContext()).execute();
-    }
-
-    @Override
-    public void onTabSelected(ActionBar.Tab tab, android.app.FragmentTransaction ft) {
-        mViewPager.setCurrentItem(tab.getPosition());
-    }
-
-    @Override
-    public void onTabUnselected(ActionBar.Tab tab, android.app.FragmentTransaction ft) {
-
-    }
-
-    @Override
-    public void onTabReselected(ActionBar.Tab tab, android.app.FragmentTransaction ft) {
-
     }
 
     @Override
@@ -164,105 +157,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                     .commit();
 
             btnGenerate.setVisibility(View.GONE);
-//
-//            mAppSectionsPagerAdapter = new AppSectionsPagerAdapter(getSupportFragmentManager());
-//
-//            final ActionBar actionBar = getActionBar();
-//
-//            actionBar.setHomeButtonEnabled(false);
-//
-//            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-//
-//            mViewPager = (ViewPager) findViewById(R.id.pager);
-//            mViewPager.setAdapter(mAppSectionsPagerAdapter);
-//            mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-//                @Override
-//                public void onPageSelected(int position) {
-//                    actionBar.setSelectedNavigationItem(position);
-//                }
-//            });
-//
-//            for (int i = 0; i < mAppSectionsPagerAdapter.getCount(); i++) {
-//                actionBar.addTab(
-//                        actionBar.newTab()
-//                                .setText(mAppSectionsPagerAdapter.getPageTitle(i))
-//                                .setTabListener(MainActivity.this));
-//            }
-
-//            ===========================================================================
-
-//            pager = (ViewPager) findViewById(R.id.pager);
-//            pagerAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager());
-//            pager.setAdapter(pagerAdapter);
-//
-//            pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-//
-//                @Override
-//                public void onPageSelected(int position) {
-//                    Log.d(TAG, "onPageSelected, position = " + position);
-//                }
-//
-//                @Override
-//                public void onPageScrolled(int position, float positionOffset,
-//                                           int positionOffsetPixels) {
-//                }
-//
-//                @Override
-//                public void onPageScrollStateChanged(int state) {
-//                }
-//            });
         }
-
-//        private class MyFragmentPagerAdapter extends FragmentPagerAdapter {
-//
-//            public MyFragmentPagerAdapter(FragmentManager fm) {
-//                super(fm);
-//            }
-//
-//            @Override
-//            public Fragment getItem(int position) {
-//                return PageFragment.newInstance(position);
-//            }
-//
-//            @Override
-//            public int getCount() {
-//                return PAGE_COUNT;
-//            }
-//        }
     }
-
-//    public static class AppSectionsPagerAdapter extends FragmentPagerAdapter {
-//
-//
-//        public AppSectionsPagerAdapter(FragmentManager fm) {
-//            super(fm);
-//        }
-//
-//        @Override
-//        public Fragment getItem(int i) {
-//            switch(i) {
-//                case 0:
-//                    return new PersonsFragment();
-//                default:
-//                    return new MapFragment();
-//            }
-//        }
-//
-//        @Override
-//        public int getCount() {
-//            return 2;
-//        }
-//
-//        @Override
-//        public CharSequence getPageTitle(int i) {
-//            switch(i) {
-//                case 0:
-//                    return "Persons";
-//                default:
-//                    return "Map";
-//            }
-//        }
-//    }
 }
 
 

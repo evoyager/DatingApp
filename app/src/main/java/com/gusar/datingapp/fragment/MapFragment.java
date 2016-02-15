@@ -12,6 +12,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +22,7 @@ import android.widget.ImageView;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -44,15 +47,28 @@ public class MapFragment extends Fragment {
     ImageLoader loader;
     ImageView photo;
     Bitmap icon;
+    View rootView;
 
     public void onAttach(Activity activity) {
         super.onAttach(activity);
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fr_maps, container, false);
+//        View rootView = inflater.inflate(R.layout.fr_maps, container, false);
         loader = new ImageLoader(getActivity());
-        return v;
+
+        if (rootView != null) {
+            ViewGroup parent = (ViewGroup) rootView.getParent();
+            if (parent != null)
+                parent.removeView(rootView);
+        }
+        try {
+            rootView = inflater.inflate(R.layout.fr_maps, container, false);
+        } catch (InflateException e) {
+            /* map is already there, just return view as it is */
+        }
+
+        return rootView;
     }
 
     @Override
@@ -65,7 +81,6 @@ public class MapFragment extends Fragment {
             fm.beginTransaction().replace(R.id.map, fragment).commit();
         }
         PERSONS = Constants.getPersons();
-
     }
 
     @Override
