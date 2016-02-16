@@ -7,9 +7,10 @@
 
     <com.gusar.datingapp.view.SlidingTabLayout
         android:id="@+id/sliding_tabs"
+        android:background="@color/dark_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="2dp"/>
+        />
 
     <android.support.v4.view.ViewPager
         android:id="@+id/pager"

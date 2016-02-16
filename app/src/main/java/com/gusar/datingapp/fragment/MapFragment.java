@@ -94,19 +94,20 @@ public class MapFragment extends Fragment {
                 Executor executor = Executors.newSingleThreadExecutor();
                 executor.execute(new Runnable() { public void run() {
                     icon = loader.getBitmap(mp.getPhoto());
-                    icon = icon.createScaledBitmap(icon, 100, 100, true);
-                    icon = circleBitmap(icon);
-                    final BitmapDescriptor descriptor = BitmapDescriptorFactory.fromBitmap(icon);
-                    Handler handler = new Handler(Looper.getMainLooper());
-                    handler.post(new Runnable(){
-                                     @Override
-                                     public void run() {
-                                         map.addMarker(new MarkerOptions().position(getLatLng(mp))
-                                                 .icon(descriptor));
-                                     }
-                                 });
-
-                    parseMap.add(getLatLng(mp).toString());
+//                    try {
+                        icon = icon.createScaledBitmap(icon, 100, 100, true);
+                        icon = circleBitmap(icon);
+                        final BitmapDescriptor descriptor = BitmapDescriptorFactory.fromBitmap(icon);
+                        Handler handler = new Handler(Looper.getMainLooper());
+                        handler.post(new Runnable(){
+                            @Override
+                            public void run() {
+                                map.addMarker(new MarkerOptions().position(getLatLng(mp))
+                                        .icon(descriptor));
+                            }
+                        });
+                        parseMap.add(getLatLng(mp).toString());
+//                    } catch (NullPointerException e){}
                 } });
             }
         }

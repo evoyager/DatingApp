@@ -35,7 +35,7 @@ public class PersonsFragment extends Fragment {
 
     static final int ANIMATION_DURATION = 200;
     protected ListView listView;
-    private List<ModelPerson> persons;
+    private List<ModelPerson> persons = new ArrayList<ModelPerson>();
     private ImageAdapter mMyAnimListAdapter;
     private ModelPerson currentPerson;
     ImageLoader imageLoader;
@@ -54,14 +54,10 @@ public class PersonsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fr_download_images,  container, false);
-//        btnGenerate = (Button) findViewById(R.id.btnGenerate);
 
-        persons = Constants.getPersons();
-
-//        final View decorView = getActivity().getWindow().getDecorView();
-//        uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-//                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-//        decorView.setSystemUiVisibility(uiOptions);
+        for (ModelPerson p: Constants.getPersons()) {
+            persons.add(p);
+        }
 
         mMyAnimListAdapter = new ImageAdapter(getActivity(), R.layout.listview_item, persons);
         listView = (ListView) rootView.findViewById(R.id.listview);
@@ -157,11 +153,11 @@ public class PersonsFragment extends Fragment {
 
             if (convertView == null) {
                 view = inflater.inflate(R.layout.listview_item, parent, false);
-                setViewHolder(view);
+                setViewHolder(view, position);
             }
             else if (((ViewHolder)convertView.getTag()).needInflate) {
                 view = inflater.inflate(R.layout.listview_item, parent, false);
-                setViewHolder(view);
+                setViewHolder(view, position);
             }
             else {
                 view = convertView;
@@ -169,27 +165,29 @@ public class PersonsFragment extends Fragment {
 
             holder = (ViewHolder) view.getTag();
             currentPerson = persons.get(position);
-            if (Constants.isLiked(currentPerson.getId())) {
-                holder.heart.setVisibility(View.VISIBLE);
-            }
+//            if (Constants.isLike(currentPerson.getId())) {
+//                holder.heart.setVisibility(View.VISIBLE);
+//            }
 
             holder.btnDislike.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    currentPerson = persons.get(position);
-                    Constants.changeLikeStatus(currentPerson.getId(), false);
-                    holder.heart.setVisibility(View.INVISIBLE);
+                    ViewHolder holderr = (ViewHolder) view.getTag();
+                    ModelPerson currentPersonn = persons.get(position);
+                    Constants.changeLikeStatus(currentPersonn.getId(), false);
+                    holderr.heart.setVisibility(View.GONE);
                     deleteCell(view, position);
                 }
             });
             holder.btnLike.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    currentPerson = persons.get(position);
-                    Constants.changeLikeStatus(currentPerson.getId(), true);
+                    ViewHolder holderr = (ViewHolder) view.getTag();
+                    ModelPerson currentPersonn = persons.get(position);
+                    Constants.changeLikeStatus(currentPersonn.getId(), true);
 //                    Intent intent = new Intent(getActivity(), MatchActivity.class);
 //                    intent.putExtra("url", currentPerson.getPhoto());
-                    holder.heart.setVisibility(View.VISIBLE);
+                    holderr.heart.setVisibility(View.VISIBLE);
                     deleteCell(view, position);
 //                    startActivity(intent);
                 }
@@ -200,13 +198,18 @@ public class PersonsFragment extends Fragment {
             return view;
         }
 
-        private void setViewHolder(View view) {
+        private void setViewHolder(View view, int pos) {
             ViewHolder vh = new ViewHolder();
             vh.image = (ImageView) view.findViewById(R.id.image);
             vh.heart = (ImageView) view.findViewById(R.id.heart);
             vh.btnLike = (Button) view.findViewById(R.id.btnLike);
             vh.btnDislike = (Button) view.findViewById(R.id.btnDislike);
             vh.needInflate = false;
+
+            if (Constants.isLike(persons.get(pos).getId())) {
+                vh.heart.setVisibility(View.VISIBLE);
+            }
+
             view.setTag(vh);
         }
     }
