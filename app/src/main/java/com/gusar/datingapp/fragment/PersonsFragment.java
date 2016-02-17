@@ -153,15 +153,17 @@ public class PersonsFragment extends Fragment {
 
             if (convertView == null) {
                 view = inflater.inflate(R.layout.listview_item, parent, false);
-                setViewHolder(view, position);
+//                setViewHolder(view, position);
             }
             else if (((ViewHolder)convertView.getTag()).needInflate) {
                 view = inflater.inflate(R.layout.listview_item, parent, false);
-                setViewHolder(view, position);
+//                setViewHolder(view, position);
             }
             else {
                 view = convertView;
             }
+
+            setViewHolder(view, position);
 
             holder = (ViewHolder) view.getTag();
             currentPerson = persons.get(position);
@@ -208,7 +210,7 @@ public class PersonsFragment extends Fragment {
 
             if (Constants.isLike(persons.get(pos).getId())) {
                 vh.heart.setVisibility(View.VISIBLE);
-            }
+            } else vh.heart.setVisibility(View.GONE);
 
             view.setTag(vh);
         }
