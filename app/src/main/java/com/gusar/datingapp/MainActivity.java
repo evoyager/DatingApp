@@ -54,6 +54,7 @@ public class MainActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+
         genBtn = (Button)findViewById(R.id.btnGenerate);
 
         btnGenerate = (Button) findViewById(R.id.btnGenerate);
@@ -64,6 +65,14 @@ public class MainActivity extends FragmentActivity {
                         REQUEST_STORAGE);
             }
         });
+    }
+
+    @Override
+    public void onPause(){
+
+        super.onPause();
+        if(mProgressDialog != null)
+            mProgressDialog.dismiss();
     }
 
     @Override
