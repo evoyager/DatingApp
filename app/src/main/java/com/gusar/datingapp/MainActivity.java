@@ -118,6 +118,7 @@ public class MainActivity extends FragmentActivity {
             mProgressDialog.setTitle("Parsing data from JSON through testlib API");
             mProgressDialog.setMessage("Loading...");
             mProgressDialog.setIndeterminate(false);
+            mProgressDialog.setCanceledOnTouchOutside(false);
             mProgressDialog.show();
         }
 

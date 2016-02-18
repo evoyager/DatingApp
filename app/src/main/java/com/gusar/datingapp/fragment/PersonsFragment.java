@@ -3,6 +3,7 @@ package com.gusar.datingapp.fragment;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
@@ -18,6 +19,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.gusar.datingapp.Constants;
 import com.gusar.datingapp.MatchActivity;
@@ -41,6 +43,8 @@ public class PersonsFragment extends Fragment {
     ImageLoader imageLoader;
     int uiOptions;
     Button btnGenerate;
+    Button btnLike;
+    Button btnDislike;
 
     @Override
     public void onAttach(Activity activity) {
@@ -51,9 +55,40 @@ public class PersonsFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
+//    @Override
+//    public void onConfigurationChanged(Configuration newConfig) {
+//        super.onConfigurationChanged(newConfig);
+//
+//        // Checks the orientation of the screen
+//        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+//            Toast.makeText(getActivity(), "landscape", Toast.LENGTH_SHORT).show();
+//            ViewGroup.MarginLayoutParams mlpLanLike = (ViewGroup.MarginLayoutParams) btnLike.getLayoutParams();
+//            mlpLanLike.setMargins(mlpLanLike.leftMargin, mlpLanLike.topMargin, mlpLanLike.rightMargin*4, mlpLanLike.bottomMargin);
+//            btnLike.requestLayout();
+//
+//            ViewGroup.MarginLayoutParams mlpLanDislike = (ViewGroup.MarginLayoutParams) btnDislike.getLayoutParams();
+//            mlpLanDislike.setMargins(mlpLanDislike.leftMargin*4, mlpLanDislike.topMargin, mlpLanDislike.rightMargin, mlpLanDislike.bottomMargin);
+//            btnDislike.requestLayout();
+//        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
+//            Toast.makeText(getActivity(), "portrait", Toast.LENGTH_SHORT).show();
+//
+//            ViewGroup.MarginLayoutParams mlpPorLike = (ViewGroup.MarginLayoutParams) btnLike.getLayoutParams();
+//            mlpPorLike.setMargins(mlpPorLike.leftMargin, mlpPorLike.topMargin, mlpPorLike.rightMargin, mlpPorLike.bottomMargin);
+//            btnLike.requestLayout();
+//
+//            ViewGroup.MarginLayoutParams mlpPorDislike = (ViewGroup.MarginLayoutParams) btnDislike.getLayoutParams();
+//            mlpPorDislike.setMargins(mlpPorDislike.leftMargin, mlpPorDislike.topMargin, mlpPorDislike.rightMargin, mlpPorDislike.bottomMargin);
+//            btnDislike.requestLayout();
+//        }
+//    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fr_download_images,  container, false);
+        View listViewInfl = inflater.inflate(R.layout.listview_item,  container, false);
+
+        btnLike = (Button) listViewInfl.findViewById(R.id.btnLike);
+        btnDislike = (Button) listViewInfl.findViewById(R.id.btnDislike);
 
         for (ModelPerson p: Constants.getPersons()) {
             persons.add(p);
@@ -206,6 +241,26 @@ public class PersonsFragment extends Fragment {
             vh.heart = (ImageView) view.findViewById(R.id.heart);
             vh.btnLike = (Button) view.findViewById(R.id.btnLike);
             vh.btnDislike = (Button) view.findViewById(R.id.btnDislike);
+            int or = getActivity().getResources().getConfiguration().orientation;
+            if (or == Configuration.ORIENTATION_LANDSCAPE) {
+                ViewGroup.MarginLayoutParams mlpLanLike = (ViewGroup.MarginLayoutParams) vh.btnLike.getLayoutParams();
+                mlpLanLike.setMargins(mlpLanLike.leftMargin, mlpLanLike.topMargin, mlpLanLike.rightMargin*2, mlpLanLike.bottomMargin);
+                vh.btnLike.requestLayout();
+
+                ViewGroup.MarginLayoutParams mlpLanDislike = (ViewGroup.MarginLayoutParams) vh.btnDislike.getLayoutParams();
+                mlpLanDislike.setMargins(mlpLanDislike.leftMargin*2, mlpLanDislike.topMargin, mlpLanDislike.rightMargin, mlpLanDislike.bottomMargin);
+                vh.btnDislike.requestLayout();
+            } else {
+                ViewGroup.MarginLayoutParams mlpPorLike = (ViewGroup.MarginLayoutParams) vh.btnLike.getLayoutParams();
+                mlpPorLike.setMargins(mlpPorLike.leftMargin, mlpPorLike.topMargin, mlpPorLike.rightMargin, mlpPorLike.bottomMargin);
+                vh.btnLike.requestLayout();
+
+                ViewGroup.MarginLayoutParams mlpPorDislike = (ViewGroup.MarginLayoutParams) vh.btnDislike.getLayoutParams();
+                mlpPorDislike.setMargins(mlpPorDislike.leftMargin, mlpPorDislike.topMargin, mlpPorDislike.rightMargin, mlpPorDislike.bottomMargin);
+                vh.btnDislike.requestLayout();
+            }
+
+
             vh.needInflate = false;
 
             if (Constants.isLike(persons.get(pos).getId())) {
