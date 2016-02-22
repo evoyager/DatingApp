@@ -2,6 +2,8 @@ package com.gusar.datingapp;
 
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -35,26 +37,24 @@ import java.util.List;
 
 public class MainActivity extends FragmentActivity {
 
-    private static final String TEST_FILE_NAME = "Universal Image Loader @#&=+-_.,!()~'%20.png";
     Fragment fr;
     String tag;
-    static ProgressDialog mProgressDialog;
     List<ModelPerson> persons;
     Button btnGenerate;
     private static final int REQUEST_STORAGE = 0;
-    ViewPager mViewPager;
-    static final int PAGE_COUNT = 2;
-    static final String TAG = "myLogs";
     Button genBtn;
+    private View mLoadingView;
 
-    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        mLoadingView = findViewById(R.id.loading_spinner);
+        mLoadingView.setVisibility(View.GONE);
 
+        // Retrieve and cache the system's default "short" animation time.
         genBtn = (Button)findViewById(R.id.btnGenerate);
 
         btnGenerate = (Button) findViewById(R.id.btnGenerate);
@@ -68,14 +68,6 @@ public class MainActivity extends FragmentActivity {
     }
 
     @Override
-    public void onPause(){
-
-        super.onPause();
-        if(mProgressDialog != null)
-            mProgressDialog.dismiss();
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
         return true;
@@ -83,7 +75,6 @@ public class MainActivity extends FragmentActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -102,7 +93,6 @@ public class MainActivity extends FragmentActivity {
     {
         super.onBackPressed();
         btnGenerate.setVisibility(View.VISIBLE);
-
     }
 
     private class DownloadJSON extends AsyncTask<Void, Void, Void> {
@@ -114,21 +104,12 @@ public class MainActivity extends FragmentActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            mProgressDialog = new ProgressDialog(MainActivity.this);
-            mProgressDialog.setTitle("Parsing data from JSON through testlib API");
-            mProgressDialog.setMessage("Loading...");
-            mProgressDialog.setIndeterminate(false);
-            mProgressDialog.setCanceledOnTouchOutside(false);
-            mProgressDialog.show();
+            btnGenerate.setVisibility(View.GONE);
+            mLoadingView.setVisibility(View.VISIBLE);
         }
 
         @Override
         protected Void doInBackground(Void... params) {
-            API.INSTANCE.init(getApplicationContext());
-            API.INSTANCE.refreshPersons(new SuccessCallback() {
-                @Override
-                public void onSuccess() {}
-            });
 
             getPersons();
 
@@ -136,6 +117,12 @@ public class MainActivity extends FragmentActivity {
         }
 
          private void getPersons() {
+             API.INSTANCE.init(getApplicationContext());
+             API.INSTANCE.refreshPersons(new SuccessCallback() {
+                 @Override
+                 public void onSuccess() {}
+             });
+
              API.INSTANCE.getPersons(Constants.getPageNum(), new PersonsExtendedCallback() {
                  @Override
                  public void onResult(String json) {
@@ -155,8 +142,9 @@ public class MainActivity extends FragmentActivity {
 
         @Override
         protected void onPostExecute(Void args) {
-            mProgressDialog.dismiss();
             super.onPostExecute(args);
+
+            mLoadingView.setVisibility(View.GONE);
 
             setTitle(R.string.app_name);
             fr = new ViewPagerFragment();
