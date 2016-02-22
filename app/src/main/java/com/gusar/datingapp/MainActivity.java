@@ -12,10 +12,12 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,19 +39,22 @@ import java.util.List;
 
 public class MainActivity extends FragmentActivity {
 
+    private static final String LOG_TAG = "";
     Fragment fr;
     String tag;
     List<ModelPerson> persons;
     Button btnGenerate;
     private static final int REQUEST_STORAGE = 0;
     Button genBtn;
-    private View mLoadingView;
-
+    private static View mLoadingView;
+    private static FragmentManager fm;
+    private static boolean clicked;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        fm = getSupportFragmentManager();
 
         mLoadingView = findViewById(R.id.loading_spinner);
         mLoadingView.setVisibility(View.GONE);
@@ -61,21 +66,25 @@ public class MainActivity extends FragmentActivity {
         btnGenerate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                clicked = !clicked;
                 ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                         REQUEST_STORAGE);
             }
         });
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu, menu);
-        return true;
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (clicked) {
+            mLoadingView.setVisibility(View.VISIBLE);
+            genBtn.setVisibility(View.GONE);
+        }
+        Log.d(LOG_TAG, "onRestoreInstanceState");
     }
 
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        return super.onPrepareOptionsMenu(menu);
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.d(LOG_TAG, "onSaveInstanceState");
     }
 
     @Override
@@ -92,6 +101,8 @@ public class MainActivity extends FragmentActivity {
     public void onBackPressed()
     {
         super.onBackPressed();
+        clicked = false;
+        mLoadingView.setVisibility(View.GONE);
         btnGenerate.setVisibility(View.VISIBLE);
     }
 
@@ -149,12 +160,10 @@ public class MainActivity extends FragmentActivity {
             setTitle(R.string.app_name);
             fr = new ViewPagerFragment();
             tag = PersonsFragment.class.getSimpleName();
-            getSupportFragmentManager().beginTransaction()
+            fm.beginTransaction()
                     .replace(android.R.id.content, fr, tag)
                     .addToBackStack("fr_image_list")
-                    .commit();
-
-            btnGenerate.setVisibility(View.GONE);
+                    .commitAllowingStateLoss();
         }
     }
 }
