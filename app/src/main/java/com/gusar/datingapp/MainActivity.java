@@ -2,9 +2,6 @@ package com.gusar.datingapp;
 
 
 import android.Manifest;
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
@@ -13,17 +10,13 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.view.ViewPager;
-import android.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ViewAnimator;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.gusar.datingapp.fragment.PersonsFragment;
@@ -32,6 +25,8 @@ import com.gusar.datingapp.model.ModelPerson;
 import org.testpackage.test_sdk.android.testlib.API;
 import org.testpackage.test_sdk.android.testlib.interfaces.PersonsExtendedCallback;
 import org.testpackage.test_sdk.android.testlib.interfaces.SuccessCallback;
+
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,24 +40,30 @@ public class MainActivity extends FragmentActivity {
     List<ModelPerson> persons;
     Button btnGenerate;
     private static final int REQUEST_STORAGE = 0;
-    Button genBtn;
     private static View mLoadingView;
     private static FragmentManager fm;
     private static boolean clicked;
+    private static boolean firstLoading = true;
+    private static boolean restored = false;
+    private static int initcount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        fm = getSupportFragmentManager();
-
-        mLoadingView = findViewById(R.id.loading_spinner);
-        mLoadingView.setVisibility(View.GONE);
-
-        // Retrieve and cache the system's default "short" animation time.
-        genBtn = (Button)findViewById(R.id.btnGenerate);
 
         btnGenerate = (Button) findViewById(R.id.btnGenerate);
+        mLoadingView = findViewById(R.id.loading_spinner);
+        mLoadingView.setVisibility(View.VISIBLE);
+        fm = getSupportFragmentManager();
+
+//        if (firstLoading & !restored) {
+//            new InitializeData().execute();
+//        }
+        if (firstLoading) {
+            new InitializeData().execute();
+        }
+
         btnGenerate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,15 +76,28 @@ public class MainActivity extends FragmentActivity {
 
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        if (clicked) {
+        if (clicked|firstLoading) {
             mLoadingView.setVisibility(View.VISIBLE);
-            genBtn.setVisibility(View.GONE);
+            btnGenerate.setVisibility(View.GONE);
         }
+          else if (!firstLoading) {
+            mLoadingView.setVisibility(View.GONE);
+            btnGenerate.setVisibility(View.VISIBLE);
+        }
+
         Log.d(LOG_TAG, "onRestoreInstanceState");
     }
 
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        restored = true;
+//        if (clicked|firstLoading) {
+//            mLoadingView.setVisibility(View.VISIBLE);
+//            btnGenerate.setVisibility(View.GONE);
+//        } else if (!firstLoading) {
+//            mLoadingView.setVisibility(View.GONE);
+//            btnGenerate.setVisibility(View.VISIBLE);
+//        }
         Log.d(LOG_TAG, "onSaveInstanceState");
     }
 
@@ -102,8 +116,42 @@ public class MainActivity extends FragmentActivity {
     {
         super.onBackPressed();
         clicked = false;
+        firstLoading = false;
         mLoadingView.setVisibility(View.GONE);
         btnGenerate.setVisibility(View.VISIBLE);
+    }
+
+    private class InitializeData extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            btnGenerate.setVisibility(View.GONE);
+            mLoadingView.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            API.INSTANCE.init(getApplicationContext());
+            API.INSTANCE.refreshPersons(new SuccessCallback() {
+                @Override
+                public void onSuccess() {
+                }
+            });
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void args) {
+            super.onPostExecute(args);
+            initcount++;
+            if (initcount!=1)
+                mLoadingView.setVisibility(View.GONE);
+            if ((initcount==1)&&(!restored))
+                mLoadingView.setVisibility(View.GONE);
+            btnGenerate.setVisibility(View.VISIBLE);
+            firstLoading = false;
+        }
     }
 
     private class DownloadJSON extends AsyncTask<Void, Void, Void> {
@@ -128,12 +176,6 @@ public class MainActivity extends FragmentActivity {
         }
 
          private void getPersons() {
-             API.INSTANCE.init(getApplicationContext());
-             API.INSTANCE.refreshPersons(new SuccessCallback() {
-                 @Override
-                 public void onSuccess() {}
-             });
-
              API.INSTANCE.getPersons(Constants.getPageNum(), new PersonsExtendedCallback() {
                  @Override
                  public void onResult(String json) {
@@ -141,8 +183,7 @@ public class MainActivity extends FragmentActivity {
                          Constants.setPageNum(0);
                          getPersons();
                      } else {
-                         Type listType = new TypeToken<ArrayList<ModelPerson>>() {
-                         }.getType();
+                         Type listType = new TypeToken<ArrayList<ModelPerson>>() {}.getType();
                          Constants.setPersons((List<ModelPerson>) new Gson().fromJson(json, listType));
                      }
                  }
