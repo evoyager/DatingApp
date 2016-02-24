@@ -1,6 +1,7 @@
 package com.gusar.datingapp;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
@@ -35,6 +36,7 @@ public class MainActivity extends FragmentActivity {
     private static boolean clicked;
     private static boolean firstLoading = true;
     private static boolean restored = false;
+    boolean activityIsDestroyed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +60,12 @@ public class MainActivity extends FragmentActivity {
                         REQUEST_STORAGE);
             }
         });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();  // Always call the superclass
+        activityIsDestroyed = true;
     }
 
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -169,7 +177,8 @@ public class MainActivity extends FragmentActivity {
             setTitle(R.string.app_name);
             fr = new ViewPagerFragment();
             tag = PersonsFragment.class.getSimpleName();
-            fm.beginTransaction()
+            if (!activityIsDestroyed)
+                fm.beginTransaction()
                     .replace(android.R.id.content, fr, tag)
                     .addToBackStack("fr_image_list")
                     .commitAllowingStateLoss();
