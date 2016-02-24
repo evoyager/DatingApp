@@ -31,7 +31,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.gusar.datingapp.Constants;
 import com.gusar.datingapp.R;
+import com.gusar.datingapp.db.ModelPersonsHolder;
 import com.gusar.datingapp.imagesdownloader.ImageLoader;
+import com.gusar.datingapp.interfaces.MyPersonsCallback;
 import com.gusar.datingapp.model.ModelPerson;
 
 import java.util.ArrayList;
@@ -80,7 +82,14 @@ public class MapFragment extends Fragment {
             fragment = SupportMapFragment.newInstance();
             fm.beginTransaction().replace(R.id.map, fragment).commit();
         }
-        PERSONS = Constants.getPersons();
+//        PERSONS = Constants.getPersons();
+        final ModelPersonsHolder personsHolder = new ModelPersonsHolder(getActivity());
+        personsHolder.getPortionPersons(0, 10, new MyPersonsCallback() {
+            @Override
+            public void onResult(List<ModelPerson> personsFromHolder) {
+                PERSONS = personsFromHolder;
+            }
+        });
     }
 
     @Override

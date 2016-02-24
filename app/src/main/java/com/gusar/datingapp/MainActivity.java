@@ -1,7 +1,6 @@
 package com.gusar.datingapp;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
@@ -15,12 +14,21 @@ import android.view.View;
 import android.widget.Button;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.gusar.datingapp.db.ModelPersonsHolder;
+import com.gusar.datingapp.db.MyDatabaseHelper;
 import com.gusar.datingapp.fragment.PersonsFragment;
 import com.gusar.datingapp.fragment.ViewPagerFragment;
+import com.gusar.datingapp.interfaces.MyPersonsCallback;
 import com.gusar.datingapp.model.ModelPerson;
+import com.j256.ormlite.dao.RuntimeExceptionDao;
+
 import org.testpackage.test_sdk.android.testlib.API;
+import org.testpackage.test_sdk.android.testlib.interfaces.PersonsCallback;
 import org.testpackage.test_sdk.android.testlib.interfaces.PersonsExtendedCallback;
 import org.testpackage.test_sdk.android.testlib.interfaces.SuccessCallback;
+import org.testpackage.test_sdk.android.testlib.model.Person;
+import org.testpackage.test_sdk.android.testlib.util.Utils;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +44,7 @@ public class MainActivity extends FragmentActivity {
     private static boolean clicked;
     private static boolean firstLoading = true;
     private static boolean restored = false;
+    private static boolean firstExecution = true;
     boolean activityIsDestroyed;
 
     @Override
@@ -88,7 +97,16 @@ public class MainActivity extends FragmentActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        new DownloadJSON(getApplicationContext()).execute();
+//        new DownloadJSON(getApplicationContext()).execute();
+        setTitle(R.string.app_name);
+        firstExecution = false;
+        fr = new ViewPagerFragment();
+        tag = PersonsFragment.class.getSimpleName();
+        if (!activityIsDestroyed)
+            fm.beginTransaction()
+                    .replace(android.R.id.content, fr, tag)
+                    .addToBackStack("fr_image_list")
+                    .commitAllowingStateLoss();
     }
 
     @Override
@@ -124,23 +142,21 @@ public class MainActivity extends FragmentActivity {
         @Override
         protected void onPostExecute(Void args) {
             super.onPostExecute(args);
-            btnGenerate.setVisibility(View.VISIBLE);
-            mLoadingView.setVisibility(View.GONE);
-            firstLoading = false;
+            if (firstExecution)
+                new ParseJSON(getApplicationContext()).execute();
         }
     }
 
-    private class DownloadJSON extends AsyncTask<Void, Void, Void> {
+    private class ParseJSON extends AsyncTask<Void, Void, Void> {
         Context context;
-        private DownloadJSON(Context context) {
-            this.context = context.getApplicationContext();
+        private ParseJSON(Context context) {
+//            this.context = context.getApplicationContext();
+            this.context = context;
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            btnGenerate.setVisibility(View.GONE);
-            mLoadingView.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -151,37 +167,39 @@ public class MainActivity extends FragmentActivity {
             return null;
         }
 
-         private void getPersons() {
-             API.INSTANCE.getPersons(Constants.getPageNum(), new PersonsExtendedCallback() {
-                 @Override
-                 public void onResult(String json) {
-                     if (json.equals("[]")) {
-                         Constants.setPageNum(0);
-                         getPersons();
-                     } else {
-                         Type listType = new TypeToken<ArrayList<ModelPerson>>() {}.getType();
-                         Constants.setPersons((List<ModelPerson>) new Gson().fromJson(json, listType));
-                     }
-                 }
-                 @Override
-                 public void onFail(String reason) {}
-             });
-         }
+        protected List<ModelPerson> persons = null;
+
+        private void getPersons() {
+
+            if (firstExecution) {
+                API.INSTANCE.getPersons(Constants.getPageNum(), new PersonsExtendedCallback() {
+                    @Override
+                    public void onResult(String json) {
+                        if (json.equals("[]")) {
+                            Constants.setPageNum(0);
+                            getPersons();
+                        } else {
+                            Type listType = new TypeToken<ArrayList<ModelPerson>>() {}.getType();
+                            persons = (List<ModelPerson>) new Gson().fromJson(json, listType);
+
+                            final ModelPersonsHolder personsHolder = new ModelPersonsHolder(context);
+                            personsHolder.savePersons(persons);
+//                         Constants.setPersons(persons);
+                        }
+                    }
+                    @Override
+                    public void onFail(String reason) {}
+                });
+            }
+        }
 
         @Override
         protected void onPostExecute(Void args) {
             super.onPostExecute(args);
-
+            firstLoading = false;
+            btnGenerate.setVisibility(View.VISIBLE);
             mLoadingView.setVisibility(View.GONE);
 
-            setTitle(R.string.app_name);
-            fr = new ViewPagerFragment();
-            tag = PersonsFragment.class.getSimpleName();
-            if (!activityIsDestroyed)
-                fm.beginTransaction()
-                    .replace(android.R.id.content, fr, tag)
-                    .addToBackStack("fr_image_list")
-                    .commitAllowingStateLoss();
         }
     }
 }

@@ -24,7 +24,9 @@ import android.widget.Toast;
 import com.gusar.datingapp.Constants;
 import com.gusar.datingapp.MatchActivity;
 import com.gusar.datingapp.R;
+import com.gusar.datingapp.db.ModelPersonsHolder;
 import com.gusar.datingapp.imagesdownloader.ImageLoader;
+import com.gusar.datingapp.interfaces.MyPersonsCallback;
 import com.gusar.datingapp.model.ModelPerson;
 
 import java.util.ArrayList;
@@ -53,6 +55,13 @@ public class PersonsFragment extends Fragment {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        final ModelPersonsHolder personsHolder = new ModelPersonsHolder(getActivity());
+        personsHolder.getPortionPersons(0, 10, new MyPersonsCallback() {
+                             @Override
+                             public void onResult(List<ModelPerson> personsFromHolder) {
+                                 persons = personsFromHolder;
+                             }
+                         });
     }
 
     @Override
@@ -63,9 +72,9 @@ public class PersonsFragment extends Fragment {
         btnLike = (Button) listViewInfl.findViewById(R.id.btnLike);
         btnDislike = (Button) listViewInfl.findViewById(R.id.btnDislike);
 
-        for (ModelPerson p: Constants.getPersons()) {
-            persons.add(p);
-        }
+//        for (ModelPerson p: Constants.getPersons()) {
+//            persons.add(p);
+//        }
 
         mMyAnimListAdapter = new ImageAdapter(getActivity(), R.layout.listview_item, persons);
         listView = (ListView) rootView.findViewById(R.id.listview);
@@ -179,29 +188,29 @@ public class PersonsFragment extends Fragment {
 //                holder.heart.setVisibility(View.VISIBLE);
 //            }
 
-            holder.btnDislike.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ViewHolder holderr = (ViewHolder) view.getTag();
-                    ModelPerson currentPersonn = persons.get(position);
-                    Constants.changeLikeStatus(currentPersonn.getId(), false);
-                    holderr.heart.setVisibility(View.GONE);
-                    deleteCell(view, position);
-                }
-            });
-            holder.btnLike.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ViewHolder holderr = (ViewHolder) view.getTag();
-                    ModelPerson currentPersonn = persons.get(position);
-                    Constants.changeLikeStatus(currentPersonn.getId(), true);
-//                    Intent intent = new Intent(getActivity(), MatchActivity.class);
-//                    intent.putExtra("url", currentPerson.getPhoto());
-                    holderr.heart.setVisibility(View.VISIBLE);
-                    deleteCell(view, position);
-//                    startActivity(intent);
-                }
-            });
+//            holder.btnDislike.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    ViewHolder holderr = (ViewHolder) view.getTag();
+//                    ModelPerson currentPersonn = persons.get(position);
+//                    Constants.changeLikeStatus(currentPersonn.getId(), false);
+//                    holderr.heart.setVisibility(View.GONE);
+//                    deleteCell(view, position);
+//                }
+//            });
+//            holder.btnLike.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    ViewHolder holderr = (ViewHolder) view.getTag();
+//                    ModelPerson currentPersonn = persons.get(position);
+//                    Constants.changeLikeStatus(currentPersonn.getId(), true);
+////                    Intent intent = new Intent(getActivity(), MatchActivity.class);
+////                    intent.putExtra("url", currentPerson.getPhoto());
+//                    holderr.heart.setVisibility(View.VISIBLE);
+//                    deleteCell(view, position);
+////                    startActivity(intent);
+//                }
+//            });
             photo = (ImageView) view.findViewById(R.id.photo);
             imageLoader.DisplayImage(currentPerson.getPhoto(), photo);
 
@@ -217,9 +226,9 @@ public class PersonsFragment extends Fragment {
 
             vh.needInflate = false;
 
-            if (Constants.isLike(persons.get(pos).getId())) {
-                vh.heart.setVisibility(View.VISIBLE);
-            } else vh.heart.setVisibility(View.GONE);
+//            if (Constants.isLike(persons.get(pos).getId())) {
+//                vh.heart.setVisibility(View.VISIBLE);
+//            } else vh.heart.setVisibility(View.GONE);
 
             view.setTag(vh);
         }

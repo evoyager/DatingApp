@@ -6,10 +6,18 @@ import com.j256.ormlite.field.DatabaseField;
  * Created by evgeniy on 14.01.16.
  */
 public class ModelPerson {
+    @DatabaseField(id = true)
     private int id;
+
+    @DatabaseField
     private String location;
+
+    @DatabaseField
     private String status;
+
+    @DatabaseField
     private String photo;
+
     private boolean like = false;
 
     public boolean isLike() {
