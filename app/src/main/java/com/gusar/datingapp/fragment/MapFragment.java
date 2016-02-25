@@ -58,6 +58,7 @@ public class MapFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 //        View rootView = inflater.inflate(R.layout.fr_maps, container, false);
         loader = new ImageLoader(getActivity());
+        PERSONS = getArguments().getParcelableArrayList("persons");
 
         if (rootView != null) {
             ViewGroup parent = (ViewGroup) rootView.getParent();
@@ -83,13 +84,13 @@ public class MapFragment extends Fragment {
             fm.beginTransaction().replace(R.id.map, fragment).commit();
         }
 //        PERSONS = Constants.getPersons();
-        final ModelPersonsHolder personsHolder = new ModelPersonsHolder(getActivity());
-        personsHolder.getPortionPersons(0, 10, new MyPersonsCallback() {
-            @Override
-            public void onResult(List<ModelPerson> personsFromHolder) {
-                PERSONS = personsFromHolder;
-            }
-        });
+//        final ModelPersonsHolder personsHolder = new ModelPersonsHolder(getActivity());
+//        personsHolder.getPortionPersons(0, 10, new MyPersonsCallback() {
+//            @Override
+//            public void onResult(List<ModelPerson> personsFromHolder) {
+//                PERSONS = personsFromHolder;
+//            }
+//        });
     }
 
     @Override

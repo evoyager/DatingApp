@@ -19,9 +19,13 @@ import android.view.ViewGroup;
 import android.widget.TabHost;
 import android.widget.TextView;
 
+import com.gusar.datingapp.model.ModelPerson;
 import com.gusar.datingapp.view.SlidingTabLayout;
 
 import com.gusar.datingapp.R;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by igusar on 2/12/16.
@@ -33,9 +37,14 @@ public class ViewPagerFragment extends Fragment {
     private FragmentTabHost tabHost;
     private SlidingTabLayout mSlidingTabLayout;
     static final String LOG_TAG = "SlidingTabsBasicFragment";
+    private static ArrayList<ModelPerson> persons = new ArrayList<ModelPerson>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Bundle bundle = this.getArguments();
+        if (bundle != null) {
+            persons = bundle.getParcelableArrayList("persons");
+        }
         return inflater.inflate(R.layout.fr_viewpager, container, false);
     }
 
@@ -60,11 +69,17 @@ public class ViewPagerFragment extends Fragment {
 
         @Override
         public Fragment getItem(int i) {
+            Bundle bundle = new Bundle();
+            bundle.putParcelableArrayList("persons", persons);
+            Fragment personsFragment = new PersonsFragment();
+            Fragment mapFragment = new MapFragment();
+            personsFragment.setArguments(bundle);
+            mapFragment.setArguments(bundle);
             switch(i) {
                 case 0:
-                    return new PersonsFragment();
+                    return personsFragment;
                 case 1:
-                    return new MapFragment();
+                    return mapFragment;
                 }
             return null;
         }

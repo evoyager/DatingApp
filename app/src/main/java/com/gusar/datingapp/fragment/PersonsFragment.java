@@ -55,13 +55,6 @@ public class PersonsFragment extends Fragment {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final ModelPersonsHolder personsHolder = new ModelPersonsHolder(getActivity());
-        personsHolder.getPortionPersons(0, 10, new MyPersonsCallback() {
-                             @Override
-                             public void onResult(List<ModelPerson> personsFromHolder) {
-                                 persons = personsFromHolder;
-                             }
-                         });
     }
 
     @Override
@@ -69,6 +62,7 @@ public class PersonsFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fr_download_images,  container, false);
         View listViewInfl = inflater.inflate(R.layout.listview_item,  container, false);
 
+        persons = getArguments().getParcelableArrayList("persons");
         btnLike = (Button) listViewInfl.findViewById(R.id.btnLike);
         btnDislike = (Button) listViewInfl.findViewById(R.id.btnDislike);
 
