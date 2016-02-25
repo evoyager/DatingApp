@@ -12,30 +12,23 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.gusar.datingapp.Constants;
 import com.gusar.datingapp.R;
-import com.gusar.datingapp.db.ModelPersonsHolder;
 import com.gusar.datingapp.imagesdownloader.ImageLoader;
-import com.gusar.datingapp.interfaces.MyPersonsCallback;
 import com.gusar.datingapp.model.ModelPerson;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -68,7 +61,6 @@ public class MapFragment extends Fragment {
         try {
             rootView = inflater.inflate(R.layout.fr_maps, container, false);
         } catch (InflateException e) {
-            /* map is already there, just return view as it is */
         }
 
         return rootView;
@@ -83,14 +75,6 @@ public class MapFragment extends Fragment {
             fragment = SupportMapFragment.newInstance();
             fm.beginTransaction().replace(R.id.map, fragment).commit();
         }
-//        PERSONS = Constants.getPersons();
-//        final ModelPersonsHolder personsHolder = new ModelPersonsHolder(getActivity());
-//        personsHolder.getPortionPersons(0, 10, new MyPersonsCallback() {
-//            @Override
-//            public void onResult(List<ModelPerson> personsFromHolder) {
-//                PERSONS = personsFromHolder;
-//            }
-//        });
     }
 
     @Override

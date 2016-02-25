@@ -2,8 +2,6 @@ package com.gusar.datingapp;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.res.Configuration;
-import android.hardware.SensorManager;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -11,32 +9,24 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.OrientationEventListener;
 import android.view.View;
 import android.widget.Button;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.gusar.datingapp.db.ModelPersonsHolder;
-import com.gusar.datingapp.db.MyDatabaseHelper;
 import com.gusar.datingapp.fragment.PersonsFragment;
 import com.gusar.datingapp.fragment.ViewPagerFragment;
-import com.gusar.datingapp.interfaces.MyPersonsCallback;
 import com.gusar.datingapp.model.ModelPerson;
-import com.j256.ormlite.dao.RuntimeExceptionDao;
-
 import org.testpackage.test_sdk.android.testlib.API;
-import org.testpackage.test_sdk.android.testlib.interfaces.PersonsCallback;
 import org.testpackage.test_sdk.android.testlib.interfaces.PersonsExtendedCallback;
 import org.testpackage.test_sdk.android.testlib.interfaces.SuccessCallback;
-import org.testpackage.test_sdk.android.testlib.model.Person;
-import org.testpackage.test_sdk.android.testlib.util.Utils;
-
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends FragmentActivity {
 
@@ -87,11 +77,24 @@ public class MainActivity extends FragmentActivity {
             @Override
             public void onClick(View v) {
                 clicked = true;
-                page_num++;
                 ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                         REQUEST_STORAGE);
             }
         });
+    }
+
+    private static Map<Integer, Boolean> likedPersons = new HashMap<Integer, Boolean>();
+
+    public static boolean personIsLiked(Integer i) {
+        return likedPersons.containsKey(i);
+    }
+
+    public static void removeIdOfLikedPerson(Integer i) {
+        likedPersons.remove(i);
+    }
+
+    public static void addIdOfLikedPerson(Integer i) {
+        likedPersons.put(i, true);
     }
 
     @Override
@@ -121,53 +124,8 @@ public class MainActivity extends FragmentActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//        new LoadData(getApplicationContext()).execute();
         new ParseJSON(getApplicationContext()).execute();
     }
-
-//    private class LoadData extends AsyncTask<Void, Void, Void> {
-//
-//        Context context;
-//        private LoadData(Context context) {
-//            this.context = context;
-//        }
-//
-//        @Override
-//        protected void onPreExecute() {
-//            super.onPreExecute();
-//
-//        }
-//
-//        @Override
-//        protected Void doInBackground(Void... params) {
-//            final ModelPersonsHolder personsHolder = new ModelPersonsHolder(context);
-//            personsHolder.getPortionPersons(0, 10, new MyPersonsCallback() {
-//                @Override
-//                public void onResult(List<ModelPerson> personsFromHolder) {
-//                    persons = personsFromHolder;
-//                }
-//            });
-//            return null;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Void args) {
-//            super.onPostExecute(args);
-//            setTitle(R.string.app_name);
-//            firstExecution = false;
-//            fr = new ViewPagerFragment();
-//            tag = PersonsFragment.class.getSimpleName();
-//            if (!activityIsDestroyed) {
-//                Bundle bundle = new Bundle();
-//                bundle.putParcelableArrayList("persons", (ArrayList)persons);
-//                fr.setArguments(bundle);
-//                fm.beginTransaction()
-//                        .replace(android.R.id.content, fr, tag)
-//                        .addToBackStack("fr_image_list")
-//                        .commitAllowingStateLoss();
-//            }
-//        }
-//    }
 
     @Override
     public void onBackPressed() {
@@ -213,7 +171,6 @@ public class MainActivity extends FragmentActivity {
         Context context;
 
         private ParseJSON(Context context) {
-//            this.context = context.getApplicationContext();
             this.context = context;
         }
 
@@ -244,9 +201,6 @@ public class MainActivity extends FragmentActivity {
                         Type listType = new TypeToken<ArrayList<ModelPerson>>() {
                         }.getType();
                         persons = (List<ModelPerson>) new Gson().fromJson(json, listType);
-//                            personsHolder = new ModelPersonsHolder(context);
-//                            personsHolder.savePersons(persons);
-//                         Constants.setPersons(persons);
                     }
                 }
 
@@ -261,6 +215,7 @@ public class MainActivity extends FragmentActivity {
             super.onPostExecute(args);
             firstLoading = false;
             mLoadingView.setVisibility(View.GONE);
+            page_num++;
 
             setTitle(R.string.app_name);
             firstExecution = false;
