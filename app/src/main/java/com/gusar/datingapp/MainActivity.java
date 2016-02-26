@@ -42,9 +42,7 @@ public class MainActivity extends FragmentActivity {
     private boolean firstExecution = true;
     boolean activityIsDestroyed;
     private List<ModelPerson> persons = new ArrayList<ModelPerson>();
-    private static ModelPersonsHolder personsHolder = null;
     private static int page_num = 0;
-    private static  OrientationEventListener mOrientationListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,19 +57,6 @@ public class MainActivity extends FragmentActivity {
         if (firstLoading & !restored) {
             new InitializeData().execute();
         }
-
-//        mOrientationListener = new OrientationEventListener(this, SensorManager.SENSOR_DELAY_NORMAL) {
-//            @Override
-//            public void onOrientationChanged(int orientation) {
-//                activityIsDestroyed = false;
-//            }
-//        };
-//
-//        if (mOrientationListener.canDetectOrientation() == true) {
-//            mOrientationListener.enable();
-//        } else {
-//            mOrientationListener.disable();
-//        }
 
         btnGenerate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,8 +84,7 @@ public class MainActivity extends FragmentActivity {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();  // Always call the superclass
-//        mOrientationListener.disable();
+        super.onDestroy();
         activityIsDestroyed = true;
     }
 
@@ -134,7 +118,6 @@ public class MainActivity extends FragmentActivity {
         firstLoading = false;
         btnGenerate.setVisibility(View.VISIBLE);
         mLoadingView.setVisibility(View.GONE);
-//        mOrientationListener.enable();
     }
 
     private class InitializeData extends AsyncTask<Void, Void, Void> {
@@ -162,8 +145,6 @@ public class MainActivity extends FragmentActivity {
             super.onPostExecute(args);
             btnGenerate.setVisibility(View.VISIBLE);
             mLoadingView.setVisibility(View.GONE);
-//            if (firstExecution)
-//                new ParseJSON(getApplicationContext()).execute();
         }
     }
 
@@ -221,7 +202,6 @@ public class MainActivity extends FragmentActivity {
             firstExecution = false;
             fr = new ViewPagerFragment();
             tag = PersonsFragment.class.getSimpleName();
-//            if (!activityIsDestroyed) {
                 Bundle bundle = new Bundle();
                 bundle.putParcelableArrayList("persons", (ArrayList) persons);
                 fr.setArguments(bundle);
@@ -229,8 +209,6 @@ public class MainActivity extends FragmentActivity {
                         .replace(android.R.id.content, fr, tag)
                         .addToBackStack("fr_image_list")
                         .commitAllowingStateLoss();
-//            }
-//            mOrientationListener.disable();
         }
     }
 }

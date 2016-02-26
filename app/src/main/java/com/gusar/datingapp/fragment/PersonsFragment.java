@@ -2,6 +2,7 @@ package com.gusar.datingapp.fragment;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -15,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.gusar.datingapp.MainActivity;
+import com.gusar.datingapp.MatchActivity;
 import com.gusar.datingapp.R;
 import com.gusar.datingapp.imagesdownloader.ImageLoader;
 import com.gusar.datingapp.model.ModelPerson;
@@ -150,11 +152,9 @@ public class PersonsFragment extends Fragment {
 
             if (convertView == null) {
                 view = inflater.inflate(R.layout.listview_item, parent, false);
-//                setViewHolder(view, position);
             }
             else if (((ViewHolder)convertView.getTag()).needInflate) {
                 view = inflater.inflate(R.layout.listview_item, parent, false);
-//                setViewHolder(view, position);
             }
             else {
                 view = convertView;
@@ -181,11 +181,11 @@ public class PersonsFragment extends Fragment {
                     ViewHolder holderr = (ViewHolder) view.getTag();
                     ModelPerson currentPersonn = persons.get(position);
                     MainActivity.addIdOfLikedPerson(currentPersonn.getId());
-//                    Intent intent = new Intent(getActivity(), MatchActivity.class);
-//                    intent.putExtra("url", currentPerson.getPhoto());
+                    Intent intent = new Intent(getActivity(), MatchActivity.class);
+                    intent.putExtra("url", currentPerson.getPhoto());
                     holderr.heart.setVisibility(View.VISIBLE);
                     deleteCell(view, position);
-//                    startActivity(intent);
+                    startActivity(intent);
                 }
             });
             photo = (ImageView) view.findViewById(R.id.photo);
