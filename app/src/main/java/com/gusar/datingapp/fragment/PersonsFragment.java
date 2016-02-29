@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,12 +15,17 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.gusar.datingapp.MainActivity;
 import com.gusar.datingapp.MatchActivity;
 import com.gusar.datingapp.R;
 import com.gusar.datingapp.imagesdownloader.ImageLoader;
 import com.gusar.datingapp.model.ModelPerson;
+
+import org.testpackage.test_sdk.android.testlib.API;
+import org.testpackage.test_sdk.android.testlib.services.UpdateService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,8 +59,31 @@ public class PersonsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fr_download_images,  container, false);
         View listViewInfl = inflater.inflate(R.layout.listview_item,  container, false);
+        final Context c = getActivity();
 
         persons = getArguments().getParcelableArrayList("persons");
+
+        API.INSTANCE.subscribeUpdates(new UpdateService.UpdateServiceListener(){
+
+            @Override
+            public void onChanges(String person) {
+                ModelPerson changedPerson = new Gson().fromJson(person, ModelPerson.class);
+                changedPerson.getId();
+                ModelPerson oldPerson = null;
+                for (ModelPerson p: persons) {
+                    if (p.getId() == changedPerson.getId())
+                        oldPerson = p;
+                }
+
+                persons.set(persons.indexOf(oldPerson), changedPerson);
+                Toast.makeText(getActivity(), "CHANGED", Toast.LENGTH_SHORT).show();
+                if (changedPerson.getStatus().equals("removed")) {
+                    Toast.makeText(getActivity(), "Removed", Toast.LENGTH_SHORT).show();
+                }
+//                    showToast("Person removed");
+            }
+        });
+
         btnLike = (Button) listViewInfl.findViewById(R.id.btnLike);
         btnDislike = (Button) listViewInfl.findViewById(R.id.btnDislike);
 
@@ -63,6 +92,12 @@ public class PersonsFragment extends Fragment {
         (listView).setAdapter(mMyAnimListAdapter);
 
         return rootView;
+    }
+
+    public void showToast(String s) {
+        Toast toast = Toast.makeText(getActivity().getApplicationContext(),s,Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
     }
 
     private void deleteCell(final View v, final int index) {
@@ -165,31 +200,40 @@ public class PersonsFragment extends Fragment {
             holder = (ViewHolder) view.getTag();
             currentPerson = persons.get(position);
 
-            holder.btnDislike.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ViewHolder holderr = (ViewHolder) view.getTag();
-                    ModelPerson currentPersonn = persons.get(position);
-                    MainActivity.removeIdOfLikedPerson(currentPersonn.getId());
-                    holderr.heart.setVisibility(View.GONE);
-                    deleteCell(view, position);
-                }
-            });
-            holder.btnLike.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ViewHolder holderr = (ViewHolder) view.getTag();
-                    ModelPerson currentPersonn = persons.get(position);
-                    MainActivity.addIdOfLikedPerson(currentPersonn.getId());
-                    Intent intent = new Intent(getActivity(), MatchActivity.class);
-                    intent.putExtra("url", currentPerson.getPhoto());
-                    holderr.heart.setVisibility(View.VISIBLE);
-                    deleteCell(view, position);
-                    startActivity(intent);
-                }
-            });
-            photo = (ImageView) view.findViewById(R.id.photo);
-            imageLoader.DisplayImage(currentPerson.getPhoto(), photo);
+            if (currentPerson.getStatus().equals("removed")) {
+                view.setVisibility(View.GONE);
+                deleteCell(view, position);
+            }
+
+            else {
+                holder.btnDislike.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ViewHolder holderr = (ViewHolder) view.getTag();
+                        ModelPerson currentPersonn = persons.get(position);
+                        MainActivity.removeIdOfLikedPerson(currentPersonn.getId());
+                        holderr.heart.setVisibility(View.GONE);
+                        deleteCell(view, position);
+//                        Toast.makeText(getActivity(), "Click!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                holder.btnLike.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ViewHolder holderr = (ViewHolder) view.getTag();
+                        ModelPerson currentPersonn = persons.get(position);
+                        MainActivity.addIdOfLikedPerson(currentPersonn.getId());
+//                        Intent intent = new Intent(getActivity(), MatchActivity.class);
+//                        intent.putExtra("url", currentPerson.getPhoto());
+                        holderr.heart.setVisibility(View.VISIBLE);
+                        deleteCell(view, position);
+//                        startActivity(intent);
+//                        Toast.makeText(getActivity(), "Click!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                photo = (ImageView) view.findViewById(R.id.photo);
+                imageLoader.DisplayImage(currentPerson.getPhoto(), photo);
+            }
 
             return view;
         }
@@ -203,7 +247,7 @@ public class PersonsFragment extends Fragment {
 
             vh.needInflate = false;
 
-            if (MainActivity.personIsLiked(persons.get(pos).getId())) {
+            if ((persons.get(pos).getStatus().equals("like"))||(MainActivity.personIsLiked(persons.get(pos).getId()))) {
                 vh.heart.setVisibility(View.VISIBLE);
             } else vh.heart.setVisibility(View.GONE);
 

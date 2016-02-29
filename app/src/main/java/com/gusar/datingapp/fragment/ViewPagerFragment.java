@@ -18,11 +18,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TabHost;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.gusar.datingapp.model.ModelPerson;
 import com.gusar.datingapp.view.SlidingTabLayout;
 
 import com.gusar.datingapp.R;
+
+import org.testpackage.test_sdk.android.testlib.API;
+import org.testpackage.test_sdk.android.testlib.services.UpdateService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +50,7 @@ public class ViewPagerFragment extends Fragment {
         if (bundle != null) {
             persons = bundle.getParcelableArrayList("persons");
         }
+
         return inflater.inflate(R.layout.fr_viewpager, container, false);
     }
 
