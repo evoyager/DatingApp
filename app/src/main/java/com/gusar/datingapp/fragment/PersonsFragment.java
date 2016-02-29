@@ -1,10 +1,17 @@
 package com.gusar.datingapp.fragment;
 
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +30,7 @@ import com.gusar.datingapp.MatchActivity;
 import com.gusar.datingapp.R;
 import com.gusar.datingapp.imagesdownloader.ImageLoader;
 import com.gusar.datingapp.model.ModelPerson;
+import com.gusar.datingapp.service.MyService;
 
 import org.testpackage.test_sdk.android.testlib.API;
 import org.testpackage.test_sdk.android.testlib.services.UpdateService;
@@ -41,10 +49,9 @@ public class PersonsFragment extends Fragment {
     private ImageAdapter mMyAnimListAdapter;
     private ModelPerson currentPerson;
     ImageLoader imageLoader;
-    int uiOptions;
-    Button btnGenerate;
     Button btnLike;
     Button btnDislike;
+    private static final int NOTIFY_ID = 101;
 
     @Override
     public void onAttach(Activity activity) {
@@ -53,16 +60,8 @@ public class PersonsFragment extends Fragment {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fr_download_images,  container, false);
-        View listViewInfl = inflater.inflate(R.layout.listview_item,  container, false);
-        final Context c = getActivity();
-
-        persons = getArguments().getParcelableArrayList("persons");
-
+//        notifyRemovedStatus();
+        Toast.makeText(getActivity(), "CHANGED", Toast.LENGTH_SHORT).show();
         API.INSTANCE.subscribeUpdates(new UpdateService.UpdateServiceListener(){
 
             @Override
@@ -77,12 +76,24 @@ public class PersonsFragment extends Fragment {
 
                 persons.set(persons.indexOf(oldPerson), changedPerson);
                 Toast.makeText(getActivity(), "CHANGED", Toast.LENGTH_SHORT).show();
+                notifyRemovedStatus();
+//                Toast.makeText(getActivity(), "CHANGED", Toast.LENGTH_SHORT).show();
                 if (changedPerson.getStatus().equals("removed")) {
-                    Toast.makeText(getActivity(), "Removed", Toast.LENGTH_SHORT).show();
                 }
 //                    showToast("Person removed");
             }
         });
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fr_download_images,  container, false);
+        View listViewInfl = inflater.inflate(R.layout.listview_item,  container, false);
+        final Context c = getActivity();
+        notifyRemovedStatus();
+
+        persons = getArguments().getParcelableArrayList("persons");
+        final Context context = getActivity();
 
         btnLike = (Button) listViewInfl.findViewById(R.id.btnLike);
         btnDislike = (Button) listViewInfl.findViewById(R.id.btnDislike);
@@ -92,6 +103,27 @@ public class PersonsFragment extends Fragment {
         (listView).setAdapter(mMyAnimListAdapter);
 
         return rootView;
+    }
+
+    public void notifyRemovedStatus() {
+        Intent notificationIntent = new Intent(Intent.ACTION_VIEW);
+        notificationIntent.setData(Uri.parse("http://google.com"));
+        PendingIntent contentIntent = PendingIntent.getActivity(getActivity(), 0, notificationIntent, 0);
+
+        Notification notification = new NotificationCompat.Builder(getActivity())
+                .setCategory(Notification.CATEGORY_PROMO)
+                .setSmallIcon(R.drawable.heart)
+                .setContentTitle("DatingApp")
+                .setContentText("Person removed")
+                .setAutoCancel(true)
+//                .addAction(android.R.drawable.ic_menu_view, "View details", contentIntent)
+                .setContentIntent(contentIntent)
+                .setPriority(Notification.PRIORITY_HIGH)
+                .setVibrate(new long[]{1000})
+                .build();
+        NotificationManager notificationManager =
+                (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(NOTIFY_ID, notification);
     }
 
     public void showToast(String s) {
