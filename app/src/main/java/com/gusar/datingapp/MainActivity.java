@@ -86,6 +86,7 @@ public class MainActivity extends FragmentActivity {
     public void onDestroy() {
         super.onDestroy();
         activityIsDestroyed = true;
+        API.INSTANCE.unSubscribeUpdates();
     }
 
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -118,6 +119,7 @@ public class MainActivity extends FragmentActivity {
         firstLoading = false;
         btnGenerate.setVisibility(View.VISIBLE);
         mLoadingView.setVisibility(View.GONE);
+        API.INSTANCE.unSubscribeUpdates();
     }
 
     private class InitializeData extends AsyncTask<Void, Void, Void> {
