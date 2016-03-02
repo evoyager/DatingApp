@@ -15,6 +15,8 @@ import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,9 +58,12 @@ public class PersonsFragment extends Fragment {
     ImageLoader imageLoader;
     Button btnLike;
     Button btnDislike;
-    private static final int NOTIFY_ID = 101;
-
     Map<Integer, Boolean> idsOfRemovedPersons = new HashMap<Integer, Boolean>();
+
+    private List<String> events = new ArrayList<>();
+    String longRemovedMsg="Id's of removed persons: ";
+    int numberOfAllerts = 1;
+    NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
 
     @Override
     public void onAttach(Activity activity) {
@@ -67,60 +72,124 @@ public class PersonsFragment extends Fragment {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        notifyRemovedStatus(1);
 
         final FragmentActivity fa = getActivity();
+        inboxStyle.addLine("Removed persons: ");
 
+        subscribeUpdates();
+    }
+
+    private void subscribeUpdates() {
         API.INSTANCE.subscribeUpdates(new UpdateService.UpdateServiceListener(){
 
             @Override
             public void onChanges(String person) {
+
                 ModelPerson changedPerson = new Gson().fromJson(person, ModelPerson.class);
                 int idOfChangedPerson = changedPerson.getId();
-                ModelPerson oldPerson = null;
-                for (ModelPerson p: persons) {
-                    if (p.getId() == idOfChangedPerson)
-                        oldPerson = p;
-                }
 
-                persons.set(persons.indexOf(oldPerson), changedPerson);
-                if (changedPerson.getStatus().equals("removed")) {
-                    if (oldPerson.equals(null)) {
-                        persons.remove(oldPerson);
-                        mMyAnimListAdapter.notifyDataSetChanged();
-                        notifyRemovedStatus(idOfChangedPerson);
-                        idsOfRemovedPersons.put(idOfChangedPerson, true);
+                ModelPerson oldPerson = null;
+                int index = 0;
+                for (ModelPerson p: persons) {
+                    if (p.getId() == idOfChangedPerson) {
+                        oldPerson = p;
+                        index = persons.indexOf(p);
+
+                        persons.set(persons.indexOf(oldPerson), changedPerson);
+                        if (changedPerson.getStatus().equals("removed")) {
+                            persons.remove(index);
+                            if(persons.size() == 0) {
+                                getActivity().onBackPressed();
+                            }
+                            notifyRemovedStatus(idOfChangedPerson);
+                            mMyAnimListAdapter.notifyDataSetChanged();
+                        }
                     }
-//
-//                    if (!idsOfRemovedPersons.containsKey(idOfChangedPerson)) {
-//                        notifyRemovedStatus(idOfChangedPerson);
-//                        idsOfRemovedPersons.put(idOfChangedPerson, true);
-////                        mMyAnimListAdapter = new ImageAdapter(getActivity(), R.layout.listview_item, persons);
-////                        (listView).setAdapter(mMyAnimListAdapter);
-//                    }
                 }
             }
         });
     }
 
-    public void notifyRemovedStatus(int idOfChangedPerson) {
-        Intent notificationIntent = new Intent(Intent.ACTION_VIEW);
-        notificationIntent.setData(Uri.parse("http://google.com"));
-        PendingIntent contentIntent = PendingIntent.getActivity(getActivity(), 0, notificationIntent, 0);
+    @Override
+    public void onResume() {
+        super.onResume();
+        subscribeUpdates();
+    }
 
+    public void notifyRemovedStatus(int idOfChangedPerson) {
+
+//        NotificationCompat.Builder  mBuilder = new NotificationCompat.Builder(getActivity());
+//
+//        String newRemovedMessage = "Person " + idOfChangedPerson + " removed";
+//        mBuilder.setContentTitle("DatingApp");
+//        mBuilder.setContentText(newRemovedMessage);
+//        mBuilder.setTicker("Implicit: New Message Received!");
+//        mBuilder.setSmallIcon(R.drawable.heart);
+//
+////        events.add(newRemovedMessage);
+//
+//        // Sets a title for the Inbox style big view
+//        inboxStyle.setBigContentTitle("More Details:");
+//        // Moves events into the big view
+//        longRemovedMsg+=idOfChangedPerson + "; ";
+//        inboxStyle.addLine(longRemovedMsg);
+//
+////        for (int i=0; i < events.size(); i++) {
+////            inboxStyle.addLine(events.get(i));
+////        }
+//
+//        mBuilder.setStyle(inboxStyle);
+//
+//        // Increase notification number every time a new notification arrives
+//        mBuilder.setNumber(numberOfAllerts++);
+//
+//        // When the user presses the notification, it is auto-removed
+//        mBuilder.setAutoCancel(true);
+//
+//        // Creates an implicit intent
+//        Intent resultIntent = new Intent("com.example.javacodegeeks.TEL_INTENT",
+//                Uri.parse("tel:123456789"));
+//        resultIntent.putExtra("from", "javacodegeeks");
+//
+//        TaskStackBuilder stackBuilder = TaskStackBuilder.create(getActivity());
+//        stackBuilder.addParentStack(MainActivity.class);
+//
+//        stackBuilder.addNextIntent(resultIntent);
+//        PendingIntent resultPendingIntent =
+//                stackBuilder.getPendingIntent(
+//                        0,
+//                        PendingIntent.FLAG_ONE_SHOT
+//                );
+//        mBuilder.setContentIntent(resultPendingIntent);
+//
+//        NotificationManager myNotificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+//
+//        myNotificationManager.notify(1234, mBuilder.build());
+
+//        ==============================================================================
+
+        Intent notificationIntent = new Intent(Intent.ACTION_VIEW);
+//        notificationIntent.setData(Uri.parse("http://google.com"));
+        PendingIntent contentIntent = PendingIntent.getActivity(getActivity(), 0, notificationIntent, 0);
+        final String GROUP_KEY_STATUS = "group_key_status";
+        longRemovedMsg+=idOfChangedPerson + "; ";
         Notification notification = new NotificationCompat.Builder(getActivity())
                 .setCategory(Notification.CATEGORY_PROMO)
                 .setSmallIcon(R.drawable.heart)
                 .setContentTitle("DatingApp")
-                .setContentText("Person " + idOfChangedPerson + " removed")
+                .setContentText(longRemovedMsg)
                 .setAutoCancel(true)
 //                .addAction(android.R.drawable.ic_menu_view, "View details", contentIntent)
                 .setContentIntent(contentIntent)
                 .setPriority(Notification.PRIORITY_HIGH)
                 .setVibrate(new long[]{100})
+                .setGroup(GROUP_KEY_STATUS)
                 .build();
+
         NotificationManager notificationManager =
                 (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(NOTIFY_ID, notification);
+        notificationManager.notify(MainActivity.NOTIFY_ID, notification);
     }
 
     public void showToastInIntentService(final String sText)
@@ -138,10 +207,8 @@ public class PersonsFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fr_download_images,  container, false);
         View listViewInfl = inflater.inflate(R.layout.listview_item,  container, false);
         final Context c = getActivity();
-//        notifyRemovedStatus();
 
         persons = getArguments().getParcelableArrayList("persons");
-        final Context context = getActivity();
 
         btnLike = (Button) listViewInfl.findViewById(R.id.btnLike);
         btnDislike = (Button) listViewInfl.findViewById(R.id.btnDislike);
@@ -170,15 +237,19 @@ public class PersonsFragment extends Fragment {
 
                 mMyAnimListAdapter.notifyDataSetChanged();
 
-                if(persons.size() == 0) {
-                    getActivity().onBackPressed();
-                }
+                closeFragmentIfPersonsListIsEmpty();
             }
 
             @Override public void onAnimationRepeat(Animation animation) {}
             @Override public void onAnimationStart(Animation animation) {}
         };
         collapse(v, al);
+    }
+
+    private void closeFragmentIfPersonsListIsEmpty(){
+        if(persons.size() == 0) {
+            getActivity().onBackPressed();
+        }
     }
 
     private void collapse(final View v, Animation.AnimationListener al) {
@@ -209,19 +280,15 @@ public class PersonsFragment extends Fragment {
         v.startAnimation(anim);
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
-
     public class ImageAdapter extends ArrayAdapter<ModelPerson> {
 
         private LayoutInflater inflater;
         private int resId;
+        Context context;
 
         public ImageAdapter(Context context, int textViewResourceId, List<ModelPerson> objects) {
             super(context, textViewResourceId, objects);
-
+            this.context = context;
             this.resId = textViewResourceId;
             this.inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             imageLoader = new ImageLoader(context);
@@ -240,6 +307,10 @@ public class PersonsFragment extends Fragment {
 
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
+            if(persons.size() == 0) {
+                ((FragmentActivity)context).onBackPressed();
+            }
+
             View view = null;
             final ViewHolder holder;
             ImageView photo;

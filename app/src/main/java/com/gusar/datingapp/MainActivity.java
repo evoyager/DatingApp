@@ -1,6 +1,7 @@
 package com.gusar.datingapp;
 
 import android.Manifest;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
@@ -43,6 +44,7 @@ public class MainActivity extends FragmentActivity {
     boolean activityIsDestroyed;
     private List<ModelPerson> persons = new ArrayList<ModelPerson>();
     private static int page_num = 0;
+    public static final int NOTIFY_ID = 101;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +70,39 @@ public class MainActivity extends FragmentActivity {
         });
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        activityIsDestroyed = true;
+        unSubscribeUpdatesAndCancelNotification();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unSubscribeUpdatesAndCancelNotification();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        clicked = false;
+        firstLoading = false;
+        btnGenerate.setVisibility(View.VISIBLE);
+        mLoadingView.setVisibility(View.GONE);
+        unSubscribeUpdatesAndCancelNotification();
+    }
+
+    private void unSubscribeUpdatesAndCancelNotification(){
+        API.INSTANCE.unSubscribeUpdates();
+        cancelNotification(NOTIFY_ID);
+    }
+
+    private void cancelNotification(int notify_id) {
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.cancel(notify_id);
+    }
+
     private static Map<Integer, Boolean> likedPersons = new HashMap<Integer, Boolean>();
 
     public static boolean personIsLiked(Integer i) {
@@ -82,12 +117,6 @@ public class MainActivity extends FragmentActivity {
         likedPersons.put(i, true);
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        activityIsDestroyed = true;
-        API.INSTANCE.unSubscribeUpdates();
-    }
 
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
@@ -110,16 +139,6 @@ public class MainActivity extends FragmentActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         new ParseJSON(getApplicationContext()).execute();
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        clicked = false;
-        firstLoading = false;
-        btnGenerate.setVisibility(View.VISIBLE);
-        mLoadingView.setVisibility(View.GONE);
-        API.INSTANCE.unSubscribeUpdates();
     }
 
     private class InitializeData extends AsyncTask<Void, Void, Void> {
