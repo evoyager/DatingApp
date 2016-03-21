@@ -4,25 +4,26 @@ import android.Manifest;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.view.MenuItem;
-import android.view.OrientationEventListener;
 import android.view.View;
 import android.widget.Button;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.gusar.datingapp.db.ModelPersonsHolder;
 import com.gusar.datingapp.fragment.PersonsFragment;
 import com.gusar.datingapp.fragment.ViewPagerFragment;
 import com.gusar.datingapp.model.ModelPerson;
+
 import org.testpackage.test_sdk.android.testlib.API;
 import org.testpackage.test_sdk.android.testlib.interfaces.PersonsExtendedCallback;
 import org.testpackage.test_sdk.android.testlib.interfaces.SuccessCallback;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;

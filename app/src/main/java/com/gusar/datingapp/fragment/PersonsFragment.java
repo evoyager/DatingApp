@@ -3,21 +3,13 @@ package com.gusar.datingapp.fragment;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.app.TaskStackBuilder;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,11 +24,9 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.gusar.datingapp.MainActivity;
-import com.gusar.datingapp.MatchActivity;
 import com.gusar.datingapp.R;
 import com.gusar.datingapp.imagesdownloader.ImageLoader;
 import com.gusar.datingapp.model.ModelPerson;
-import com.gusar.datingapp.service.MyService;
 
 import org.testpackage.test_sdk.android.testlib.API;
 import org.testpackage.test_sdk.android.testlib.services.UpdateService;
@@ -94,7 +84,7 @@ public class PersonsFragment extends Fragment {
             public void onChanges(String person) {
 
                 ModelPerson changedPerson = new Gson().fromJson(person, ModelPerson.class);
-                int idOfChangedPerson = changedPerson.getId();
+                final int idOfChangedPerson = changedPerson.getId();
 
                 ModelPerson oldPerson = null;
                 int index = 0;
@@ -105,17 +95,17 @@ public class PersonsFragment extends Fragment {
 
                         persons.set(persons.indexOf(oldPerson), changedPerson);
                         if (changedPerson.getStatus().equals("removed")) {
-//                            persons.remove(index);
-//                            mMyAnimListAdapter.notifyDataSetChanged();
-//                            if (persons.size() == 0) {
-//                                numberOfAllerts = 1;
-//                                ((FragmentActivity)context).onBackPressed();
-//                            }
+                            persons.remove(index);
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mMyAnimListAdapter.notifyDataSetChanged();
+                                    if (persons.size() == 0) {
+                                        getActivity().onBackPressed();
+                                    }
+                                }
+                            });
                             notifyRemovedStatus(idOfChangedPerson);
-//                            View new_view = inflater.inflate(R.layout.listview_item, null, false);
-//                            deleteCell(new_view, index);
-
-
                         }
                     }
                 }
@@ -144,7 +134,7 @@ public class PersonsFragment extends Fragment {
                 .setContentText(longRemovedMsg)
                 .setAutoCancel(true)
 //                .setContentIntent(contentIntent)
-                .setPriority(Notification.PRIORITY_DEFAULT)
+                .setPriority(Notification.PRIORITY_HIGH)
                 .setVibrate(new long[]{100})
 //                .setGroup(GROUP_KEY_STATUS)
                 .build();
@@ -187,12 +177,19 @@ public class PersonsFragment extends Fragment {
         Animation out = AnimationUtils.makeOutAnimation(getActivity(), true);
         rowView.startAnimation(out);
         rowView.setVisibility(View.INVISIBLE);
-        Handler handle = new Handler();
+        Handler handle = new Handler(Looper.getMainLooper());
         handle.postDelayed(new Runnable() {
 
             public void run() {
-                persons.remove(positon);
+                try {
+                    persons.remove(positon);
+                } catch (IndexOutOfBoundsException e){}
                 mMyAnimListAdapter.notifyDataSetChanged();
+                if (persons.size() == 0) {
+                    try {
+                        getActivity().onBackPressed();
+                    } catch (NullPointerException e){}
+                }
             }
         }, 500);
     }
