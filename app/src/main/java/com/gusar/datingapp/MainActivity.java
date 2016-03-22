@@ -43,6 +43,9 @@ public class MainActivity extends FragmentActivity {
     private static boolean restored = false;
     private boolean firstExecution = true;
     boolean activityIsDestroyed;
+    private List<ModelPerson> persons1 = new ArrayList<ModelPerson>();
+    private List<ModelPerson> persons2 = new ArrayList<ModelPerson>();
+
     private List<ModelPerson> persons = new ArrayList<ModelPerson>();
     public static int page_num = 0;
     public static final int NOTIFY_ID = 101;
@@ -212,11 +215,13 @@ public class MainActivity extends FragmentActivity {
                 public void onResult(String json) {
                     if (json.equals("[]")) {
                         page_num = 0;
-                        getPersons();
+//                        getPersons();
                     } else {
                         Type listType = new TypeToken<ArrayList<ModelPerson>>() {
                         }.getType();
-                        persons = (List<ModelPerson>) new Gson().fromJson(json, listType);
+                        persons.addAll((List<ModelPerson>) new Gson().fromJson(json, listType));
+                        page_num++;
+                        getPersons();
                     }
                 }
 
@@ -224,6 +229,7 @@ public class MainActivity extends FragmentActivity {
                 public void onFail(String reason) {
                 }
             });
+
         }
 
         @Override
@@ -231,7 +237,7 @@ public class MainActivity extends FragmentActivity {
             super.onPostExecute(args);
             firstLoading = false;
             mLoadingView.setVisibility(View.GONE);
-            page_num++;
+//            page_num++;
 
             setTitle(R.string.app_name);
             firstExecution = false;

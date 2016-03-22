@@ -143,18 +143,24 @@ public class PersonsFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     ViewHolder holderr = (ViewHolder) finalView.getTag();
-                    ModelPerson currentPersonn = persons.get(position);
+                    final ModelPerson currentPersonn = persons.get(position);
                     MainActivity.removeIdOfLikedPerson(currentPersonn.getId());
                     MainActivity.removeIdOfLikedFromButtonPerson(currentPersonn.getId());
                     holderr.heart.setVisibility(View.GONE);
                     removeListItem(finalView, position);
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            MapFragment.markers.get(currentPersonn.getId()).remove();
+                        }
+                    });
                 }
             });
             holder.btnLike.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     ViewHolder holderr = (ViewHolder) finalView.getTag();
-                    ModelPerson currentPersonn = persons.get(position);
+                    final ModelPerson currentPersonn = persons.get(position);
                     if (MainActivity.personIsLiked(persons.get(position).getId())) {
 //                        Intent intent = new Intent(getActivity(), MatchActivity.class);
 //                        intent.putExtra("url", currentPerson.getPhoto());
@@ -165,6 +171,12 @@ public class PersonsFragment extends Fragment {
 
                     holderr.heart.setVisibility(View.VISIBLE);
                     removeListItem(finalView, position);
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            MapFragment.markers.get(currentPersonn.getId()).remove();
+                        }
+                    });
                 }
             });
             photo = (ImageView) view.findViewById(R.id.photo);
