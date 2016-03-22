@@ -2,6 +2,7 @@ package com.gusar.datingapp.fragment;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -18,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.gusar.datingapp.MainActivity;
+import com.gusar.datingapp.MatchActivity;
 import com.gusar.datingapp.R;
 import com.gusar.datingapp.imagesdownloader.ImageLoader;
 import com.gusar.datingapp.model.ModelPerson;
@@ -93,7 +95,7 @@ public class PersonsFragment extends Fragment {
                     } catch (NullPointerException e){}
                 }
             }
-        }, 500);
+        }, 300);
     }
 
     public class ImageAdapter extends ArrayAdapter<ModelPerson> {
@@ -162,9 +164,9 @@ public class PersonsFragment extends Fragment {
                     ViewHolder holderr = (ViewHolder) finalView.getTag();
                     final ModelPerson currentPersonn = persons.get(position);
                     if (MainActivity.personIsLiked(persons.get(position).getId())) {
-//                        Intent intent = new Intent(getActivity(), MatchActivity.class);
-//                        intent.putExtra("url", currentPerson.getPhoto());
-//                        startActivity(intent);
+                        Intent intent = new Intent(getActivity(), MatchActivity.class);
+                        intent.putExtra("url", currentPersonn.getPhoto());
+                        startActivity(intent);
                     }
                     MainActivity.addIdOfLikedPerson(currentPersonn.getId());
                     MainActivity.addIdOfLikedFromButtonPerson(currentPersonn.getId());

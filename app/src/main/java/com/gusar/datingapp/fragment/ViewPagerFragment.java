@@ -3,6 +3,9 @@ package com.gusar.datingapp.fragment;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v4.app.Fragment;
@@ -154,8 +157,15 @@ public class ViewPagerFragment extends Fragment {
         notificationManager.notify(MainActivity.NOTIFY_ID, notification);
 
         Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
-        // Vibrate for 500 milliseconds
         v.vibrate(500);
+
+        try {
+            Uri soundNotification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            Ringtone r = RingtoneManager.getRingtone(getActivity(), soundNotification);
+            r.play();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static class MyAdapter extends FragmentPagerAdapter {
