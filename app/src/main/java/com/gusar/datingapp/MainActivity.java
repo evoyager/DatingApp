@@ -44,7 +44,7 @@ public class MainActivity extends FragmentActivity {
     private boolean firstExecution = true;
     boolean activityIsDestroyed;
     private List<ModelPerson> persons = new ArrayList<ModelPerson>();
-    private static int page_num = 0;
+    public static int page_num = 0;
     public static final int NOTIFY_ID = 101;
 
     @Override

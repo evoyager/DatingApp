@@ -16,7 +16,7 @@ import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -25,14 +25,20 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.gusar.datingapp.MainActivity;
 import com.gusar.datingapp.R;
 import com.gusar.datingapp.imagesdownloader.ImageLoader;
 import com.gusar.datingapp.model.ModelPerson;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+
 import static java.lang.Math.min;
 
 public class MapFragment extends Fragment {
@@ -40,18 +46,19 @@ public class MapFragment extends Fragment {
     private SupportMapFragment fragment;
     private static List<ModelPerson> PERSONS;
     ImageLoader loader;
-    ImageView photo;
     Bitmap icon;
     View rootView;
+    int page_num;
+    public  static Map<Integer, Marker> markers = new HashMap<Integer, Marker>();
 
     public void onAttach(Activity activity) {
         super.onAttach(activity);
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-//        View rootView = inflater.inflate(R.layout.fr_maps, container, false);
         loader = new ImageLoader(getActivity());
         PERSONS = getArguments().getParcelableArrayList("persons");
+        page_num = MainActivity.page_num;
 
         if (rootView != null) {
             ViewGroup parent = (ViewGroup) rootView.getParent();
@@ -60,8 +67,7 @@ public class MapFragment extends Fragment {
         }
         try {
             rootView = inflater.inflate(R.layout.fr_maps, container, false);
-        } catch (InflateException e) {
-        }
+        } catch (InflateException e) {}
 
         return rootView;
     }
@@ -77,9 +83,7 @@ public class MapFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
+    private void addMarkers() {
         if (map == null) {
             map = fragment.getMap();
             final List<String> parseMap = new ArrayList<String>();
@@ -88,24 +92,29 @@ public class MapFragment extends Fragment {
                 Executor executor = Executors.newSingleThreadExecutor();
                 executor.execute(new Runnable() { public void run() {
                     icon = loader.getBitmap(mp.getPhoto());
-//                    try {
-                        icon = icon.createScaledBitmap(icon, 100, 100, true);
-                        icon = circleBitmap(icon);
-                        final BitmapDescriptor descriptor = BitmapDescriptorFactory.fromBitmap(icon);
-                        Handler handler = new Handler(Looper.getMainLooper());
-                        handler.post(new Runnable(){
-                            @Override
-                            public void run() {
-                                map.addMarker(new MarkerOptions().position(getLatLng(mp))
-                                        .icon(descriptor));
-                            }
-                        });
-                        parseMap.add(getLatLng(mp).toString());
-//                    } catch (NullPointerException e){}
+                    icon = icon.createScaledBitmap(icon, 100, 100, true);
+                    icon = circleBitmap(icon);
+                    final BitmapDescriptor descriptor = BitmapDescriptorFactory.fromBitmap(icon);
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    handler.post(new Runnable(){
+                        @Override
+                        public void run() {
+                            Marker marker = map.addMarker(new MarkerOptions().position(getLatLng(mp))
+                                    .icon(descriptor));
+                            markers.put(mp.getId(), marker);
+                        }
+                    });
+                    parseMap.add(getLatLng(mp).toString());
                 } });
             }
         }
         zoomCamera();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        addMarkers();
     }
 
     private Bitmap circleBitmap(Bitmap b) {

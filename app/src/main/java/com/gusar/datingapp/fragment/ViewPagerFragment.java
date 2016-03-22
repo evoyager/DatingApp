@@ -1,36 +1,29 @@
 package com.gusar.datingapp.fragment;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.app.FragmentTabHost;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.PagerAdapter;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TabHost;
-import android.widget.TextView;
-import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
+import com.gusar.datingapp.MainActivity;
+import com.gusar.datingapp.R;
 import com.gusar.datingapp.model.ModelPerson;
 import com.gusar.datingapp.view.SlidingTabLayout;
-
-import com.gusar.datingapp.R;
 
 import org.testpackage.test_sdk.android.testlib.API;
 import org.testpackage.test_sdk.android.testlib.services.UpdateService;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by igusar on 2/12/16.
@@ -39,10 +32,11 @@ public class ViewPagerFragment extends Fragment {
 
     MyAdapter adapter;
     ViewPager mViewPager;
-    private FragmentTabHost tabHost;
     private SlidingTabLayout mSlidingTabLayout;
-    static final String LOG_TAG = "SlidingTabsBasicFragment";
     private static ArrayList<ModelPerson> persons = new ArrayList<ModelPerson>();
+    String ids = "", longRemovedMsg = "";
+    int numberOfAllerts = 0;
+    String removedMsg = "Removed persons: ";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -64,10 +58,84 @@ public class ViewPagerFragment extends Fragment {
         mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setDistributeEvenly(true);
         mSlidingTabLayout.setViewPager(mViewPager);
+
+        subscribeUpdates();
+    }
+
+    private void subscribeUpdates() {
+
+        API.INSTANCE.subscribeUpdates(new UpdateService.UpdateServiceListener() {
+
+            @Override
+            public void onChanges(final String person) {
+
+                final ModelPerson changedPerson = new Gson().fromJson(person, ModelPerson.class);
+                final int idOfChangedPerson = changedPerson.getId();
+
+                ModelPerson oldPerson = null;
+                int index = 0;
+                for (final ModelPerson p : persons) {
+                    if (p.getId() == idOfChangedPerson) {
+                        oldPerson = p;
+                        index = persons.indexOf(p);
+
+                        persons.set(persons.indexOf(oldPerson), changedPerson);
+
+                        final int finalIndex = index;
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    MapFragment.markers.get(p.getId()).setPosition(getLatLng(changedPerson));
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+
+                                if (changedPerson.getStatus().equals("removed")) {
+                                    persons.remove(finalIndex);
+                                    notifyRemovedStatus(idOfChangedPerson);
+                                    PersonsFragment.mMyAnimListAdapter.notifyDataSetChanged();
+                                        MapFragment.markers.get(p.getId()).remove();
+                                        if (persons.size() == 0) {
+                                            getActivity().onBackPressed();
+                                        }
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    }
+
+    private LatLng getLatLng(ModelPerson person) {
+        String[] splitLocation = person.getLocation().split(",");
+        Double lat = Double.parseDouble(splitLocation[0]);
+        Double lon = Double.parseDouble(splitLocation[1]);
+        return new LatLng(lat, lon);
+    }
+
+    public void notifyRemovedStatus(int idOfChangedPerson) {
+
+        numberOfAllerts++;
+        ids += idOfChangedPerson + "; ";
+        longRemovedMsg = removedMsg + "[" + numberOfAllerts + "] - " + ids;
+        Notification notification = new NotificationCompat.Builder(getActivity())
+                .setCategory(Notification.CATEGORY_PROMO)
+                .setSmallIcon(R.drawable.heart)
+                .setContentTitle("DatingApp")
+                .setContentText(longRemovedMsg)
+                .setAutoCancel(true)
+                .setPriority(Notification.PRIORITY_HIGH)
+                .setVibrate(new long[]{100})
+                .build();
+
+        NotificationManager notificationManager =
+                (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(MainActivity.NOTIFY_ID, notification);
     }
 
     public static class MyAdapter extends FragmentPagerAdapter {
-
 
         public MyAdapter(FragmentManager fm) {
                 super(fm);
