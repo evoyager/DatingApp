@@ -1,8 +1,6 @@
 package com.gusar.datingapp.fragment;
 
 import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
@@ -57,22 +55,6 @@ public class PersonsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-    }
-
-    public void notifyLikedStatus() {
-        Notification notification = new NotificationCompat.Builder(getActivity())
-                .setCategory(Notification.CATEGORY_PROMO)
-                .setSmallIcon(R.drawable.heart)
-                .setContentTitle("DatingApp")
-                .setContentText("This is MATCH")
-                .setAutoCancel(true)
-                .setPriority(Notification.PRIORITY_HIGH)
-                .setVibrate(new long[]{100})
-                .build();
-
-        NotificationManager notificationManager =
-                (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(MainActivity.NOTIFY_ID, notification);
     }
 
     @Override
@@ -163,6 +145,7 @@ public class PersonsFragment extends Fragment {
                     ViewHolder holderr = (ViewHolder) finalView.getTag();
                     ModelPerson currentPersonn = persons.get(position);
                     MainActivity.removeIdOfLikedPerson(currentPersonn.getId());
+                    MainActivity.removeIdOfLikedFromButtonPerson(currentPersonn.getId());
                     holderr.heart.setVisibility(View.GONE);
                     removeListItem(finalView, position);
                 }
@@ -172,15 +155,16 @@ public class PersonsFragment extends Fragment {
                 public void onClick(View v) {
                     ViewHolder holderr = (ViewHolder) finalView.getTag();
                     ModelPerson currentPersonn = persons.get(position);
-                    if (MainActivity.personIsLiked(persons.get(position).getId()))
-                        notifyLikedStatus();
-                    MainActivity.addIdOfLikedPerson(currentPersonn.getId());
+                    if (MainActivity.personIsLiked(persons.get(position).getId())) {
 //                        Intent intent = new Intent(getActivity(), MatchActivity.class);
 //                        intent.putExtra("url", currentPerson.getPhoto());
+//                        startActivity(intent);
+                    }
+                    MainActivity.addIdOfLikedPerson(currentPersonn.getId());
+                    MainActivity.addIdOfLikedFromButtonPerson(currentPersonn.getId());
+
                     holderr.heart.setVisibility(View.VISIBLE);
                     removeListItem(finalView, position);
-
-//                        startActivity(intent);
                 }
             });
             photo = (ImageView) view.findViewById(R.id.photo);

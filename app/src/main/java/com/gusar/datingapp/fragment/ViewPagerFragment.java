@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -99,6 +100,8 @@ public class ViewPagerFragment extends Fragment {
                                         if (persons.size() == 0) {
                                             getActivity().onBackPressed();
                                         }
+                                } else if ((changedPerson.getStatus().equals("like"))&&(MainActivity.personIsLikedFromButton(changedPerson.getId()))) {
+                                    notifyLikedStatus();
                                 }
                             }
                         });
@@ -133,6 +136,26 @@ public class ViewPagerFragment extends Fragment {
         NotificationManager notificationManager =
                 (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(MainActivity.NOTIFY_ID, notification);
+    }
+
+    public void notifyLikedStatus() {
+        Notification notification = new NotificationCompat.Builder(getActivity())
+                .setCategory(Notification.CATEGORY_PROMO)
+                .setSmallIcon(R.drawable.heart)
+                .setContentTitle("DatingApp")
+                .setContentText("This is MATCH")
+                .setAutoCancel(true)
+                .setPriority(Notification.PRIORITY_HIGH)
+                .setVibrate(new long[]{100})
+                .build();
+
+        NotificationManager notificationManager =
+                (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(MainActivity.NOTIFY_ID, notification);
+
+        Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+        // Vibrate for 500 milliseconds
+        v.vibrate(500);
     }
 
     public static class MyAdapter extends FragmentPagerAdapter {

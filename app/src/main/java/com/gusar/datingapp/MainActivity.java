@@ -106,18 +106,31 @@ public class MainActivity extends FragmentActivity {
 
     private static Map<Integer, Boolean> likedPersons = new HashMap<Integer, Boolean>();
 
+    private static Map<Integer, Boolean> likedFromButtonPersons = new HashMap<Integer, Boolean>();
+
     public static boolean personIsLiked(Integer i) {
         return likedPersons.containsKey(i);
+    }
+
+    public static boolean personIsLikedFromButton(Integer i) {
+        return likedFromButtonPersons.containsKey(i);
     }
 
     public static void removeIdOfLikedPerson(Integer i) {
         likedPersons.remove(i);
     }
 
+    public static void removeIdOfLikedFromButtonPerson(Integer i) {
+        likedFromButtonPersons.remove(i);
+    }
+
     public static void addIdOfLikedPerson(Integer i) {
         likedPersons.put(i, true);
     }
 
+    public static void addIdOfLikedFromButtonPerson(Integer i) {
+        likedFromButtonPersons.put(i, true);
+    }
 
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
